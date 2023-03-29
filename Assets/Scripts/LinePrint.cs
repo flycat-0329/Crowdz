@@ -15,11 +15,13 @@ public class LinePrint : MonoBehaviour
     public ESManager esManager;
     public EffectManager effectManager;
     public ChoiceManager choiceManager;
+    public SaveManager saveManager;
     public TextMeshProUGUI nameText;    //이름 나오는 텍스트
     public TextMeshProUGUI mainText;    //대사 나오는 텍스트
     private int scriptIndex = -1;        //현재 몇번째 대사인가, 세이브/로드 구현 시 바뀔 부분
     private float typingSpeed = 0.025f;       //글자 출력 주기
     private bool onTyping = false;      //글자가 나오는 중인가?
+    private string scriptTitle;
     public Text t;                      //나중에 없앨거
     int lineActionIndex = 0;            //한 대사 안에서 몇번째 연출을 수행중인가
     bool onTimer = false;               //일시정지중인가?
@@ -40,6 +42,7 @@ public class LinePrint : MonoBehaviour
     }
     public void NewScript(String scriptName)
     {  //새로운 대본 파일을 읽어오는 함수(미완성)
+        scriptTitle = scriptName;
         KeyValuePair<List<List<string>>, List<List<List<string>>>> a = storyManager.storyFileRead(scriptName + ".txt");
         script = a.Key;
         action = a.Value;
@@ -92,8 +95,9 @@ public class LinePrint : MonoBehaviour
 
             switch (oneAction[0])
             {
-                case "등장":    //<등장, 캐릭터 이름, 표정, x좌표(0 ~ 1), y좌표(0 ~ 1)>
-                    characterManager.setCharacter(oneAction[1], oneAction[2], float.Parse(oneAction[3]), float.Parse(oneAction[4]));
+                case "등장":    //<등장, 캐릭터 이름, 표정, 자세, x좌표(0 ~ 1), y좌표(0 ~ 1)>
+                    characterManager.setCharacter(oneAction[1], oneAction[2], oneAction[3], 
+                    float.Parse(oneAction[4]), float.Parse(oneAction[5]));
                     ActionPlay();
                     break;
                 case "표정":    //<표정, 바꿀 캐릭터, 바꿀 표정>
@@ -120,9 +124,9 @@ public class LinePrint : MonoBehaviour
                     characterManager.FadeOut(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
-                case "페이드인":    //<페이드인, 캐릭터, 표정, x좌표(0 ~ 1), y좌표(0 ~ 1), 시간>
-                    characterManager.FadeIn(oneAction[1], oneAction[2], float.Parse(oneAction[3]),
-                    float.Parse(oneAction[4]), float.Parse(oneAction[5]));
+                case "페이드인":    //<페이드인, 캐릭터, 표정, 자세, x좌표(0 ~ 1), y좌표(0 ~ 1), 시간>
+                    characterManager.FadeIn(oneAction[1], oneAction[2], oneAction[3], float.Parse(oneAction[4]),
+                    float.Parse(oneAction[5]), float.Parse(oneAction[6]));
                     ActionPlay();
                     break;
                 case "이동":        //<이동, 캐릭터, x좌표(0 ~ 1), y좌표(0 ~ 1), 시간>
@@ -215,6 +219,27 @@ public class LinePrint : MonoBehaviour
         while(onSkip){
             PrintController();
             yield return skiper;
+        }
+    }
+
+    public void SaveClicked(int saveIndex){
+        if(characterManager.currentCharacter.Count == 0){
+            DataSet dataSet = new DataSet(scriptIndex, scriptTitle, backgroundManager.background.name
+            ,bgmManager.BGMname, SettingManager.instance.mainVolume, SettingManager.instance.esVolume);
+
+            saveManager.GameSave(dataSet, saveIndex);
+        }
+        else if(characterManager.currentCharacter.Count == 1){
+            DataSet dataSet = new DataSet(characterManager.characterOne, scriptIndex, scriptTitle, backgroundManager.background.name
+            ,bgmManager.BGMname, SettingManager.instance.mainVolume, SettingManager.instance.esVolume);
+
+            saveManager.GameSave(dataSet, saveIndex);
+        }
+        else if(characterManager.currentCharacter.Count == 2){
+            DataSet dataSet = new DataSet(characterManager.characterOne, characterManager.characterTwo, scriptIndex, scriptTitle, 
+            backgroundManager.background.name ,bgmManager.BGMname, SettingManager.instance.mainVolume, SettingManager.instance.esVolume);
+
+            saveManager.GameSave(dataSet, saveIndex);
         }
     }
 }

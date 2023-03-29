@@ -6,21 +6,23 @@ using DG.Tweening;
 
 public class CharacterManager : MonoBehaviour
 {
-    Dictionary<string, GameObject> currentCharacter = new Dictionary<string, GameObject>();
-    Object[] faceImageList;
-    Object[] characterImageList;
-    public GameObject character;
-    public Canvas characterCanvas;
-    private Sequence fadeOutSequence;
-    private Sequence fadeInSequence;
-    private Sequence characterMoveSequence;
+    public Dictionary<string, GameObject> currentCharacter = new Dictionary<string, GameObject>();  //현재 존재하는 캐릭터들
+    public List<string> characterOne = new List<string>(); //저장할때 쓰이는 변수
+    public List<string> characterTwo = new List<string>(); //저장할때 쓰이는 변수
+    Object[] faceImageList; //시작할때 불러오는 캐릭터 얼굴 이미지
+    Object[] characterImageList;    //시작할때 불러오는 캐릭터 몸통 이미지
+    public GameObject character;    //캐릭터 오리지널 형태
+    public Canvas characterCanvas;  //캐릭터가 있는 캔버스
+    private Sequence fadeOutSequence;   //dotween
+    private Sequence fadeInSequence;    //dotween
+    private Sequence characterMoveSequence; //dotween
 
     private void Start()
     {
         faceImageList = Resources.LoadAll("Images/Character/Face");
         characterImageList = Resources.LoadAll("Images/Character/Body");
     }
-    public void setCharacter(string characterName, string characterFace, float xpos, float ypos)
+    public void setCharacter(string characterName, string characterFace, string characterBody, float xpos, float ypos)
     {
         GameObject newActor = Instantiate(character);
         newActor.transform.SetParent(characterCanvas.transform);
@@ -32,15 +34,31 @@ public class CharacterManager : MonoBehaviour
         newActor.transform.localScale = new Vector3(1, 1, 1);
         newActor.transform.GetChild(0).transform.localScale = new Vector3(1, 1, 1);
 
-        newActor.GetComponent<Image>().sprite = FindCha(characterName + "Body");    //캐릭터의 몸 이미지
+        newActor.GetComponent<Image>().sprite = FindCha(characterName + "_" + characterBody);    //캐릭터의 몸 이미지
         SetFace(newActor, characterFace);
         currentCharacter[characterName] = newActor.gameObject;
         print(characterName);
+
+        if(currentCharacter.Count == 0){
+            characterOne.Add(characterName);
+            characterOne.Add(xpos.ToString());
+            characterOne.Add(ypos.ToString());
+            characterOne.Add(characterBody);
+            characterOne.Add(characterFace);    //저장할때 쓰이는 데이터
+        }
+        else if(currentCharacter.Count == 1){
+            characterTwo.Add(characterName);
+            characterTwo.Add(xpos.ToString());
+            characterTwo.Add(ypos.ToString());
+            characterTwo.Add(characterBody);
+            characterTwo.Add(characterFace);    //저장할때 쓰이는 데이터
+        }
+        
     }
 
-    public void FadeIn(string name, string face, float xpos, float ypos, float time)
+    public void FadeIn(string name, string face, string body, float xpos, float ypos, float time)
     {
-        setCharacter(name, face, xpos, ypos);
+        setCharacter(name, face, body, xpos, ypos);
         currentCharacter[name].GetComponent<Image>().color = new Color(255, 255, 255, 0);
         currentCharacter[name].transform.GetChild(0).GetComponent<Image>().color = new Color(255, 255, 255, 0);
 

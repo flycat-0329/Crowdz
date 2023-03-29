@@ -8,9 +8,7 @@ public class BGMmanager : MonoBehaviour
 {
     public Object[] BGMList;
     //배경 사운드들이 들어갈 리스트
-    //리스트를 어떻게 채울지는 한번 생각해봅시다.
-    //정 애매하면 resources 폴더 써야지
-    //그런데 그것이 실제로 일어났습니다.
+    public string BGMname;
     public AudioSource BGaudioSource;
     //브금을 출력시키는 스피커
     public Slider BGslider;
@@ -22,6 +20,7 @@ public class BGMmanager : MonoBehaviour
         bgmVolume();
     }
     public void playBGM(string name, float scriptVolume){  //대본에 적힌 브금과 볼륨으로 브금 틀기
+        BGMname = name;
         BGaudioSource.Stop();   //일단 브금을 멈추고
 
         AudioClip bgAudio = findBGM(name);  //브금 이름으로 BGAudioClips에서 브금을 찾아옴
@@ -35,6 +34,7 @@ public class BGMmanager : MonoBehaviour
     }
 
     public void playBGM(string name, float scriptVolume, float fadeTime){
+        BGMname = name;
         BGaudioSource.Stop();   //일단 브금을 멈추고
 
         AudioClip bgAudio = findBGM(name);  //브금 이름으로 BGAudioClips에서 브금을 찾아옴
