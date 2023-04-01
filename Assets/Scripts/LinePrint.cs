@@ -16,6 +16,7 @@ public class LinePrint : MonoBehaviour
     public EffectManager effectManager;
     public ChoiceManager choiceManager;
     public SaveManager saveManager;
+    public DataSet dataSet;
     public TextMeshProUGUI nameText;    //이름 나오는 텍스트
     public TextMeshProUGUI mainText;    //대사 나오는 텍스트
     private int scriptIndex = -1;        //현재 몇번째 대사인가, 세이브/로드 구현 시 바뀔 부분
@@ -85,7 +86,6 @@ public class LinePrint : MonoBehaviour
             StartCoroutine(PrintLine(script[scriptIndex][2]));  //대사 출력
         }
     }
-
     public void ActionPlay()    //클릭했을 때 다음 대사에 맞는 연출을 띄우는 함수
     {
         if(lineActionIndex < action[scriptIndex].Count){
@@ -101,7 +101,7 @@ public class LinePrint : MonoBehaviour
                     ActionPlay();
                     break;
                 case "표정":    //<표정, 바꿀 캐릭터, 바꿀 표정>
-                    characterManager.SetFace(characterManager.getCurrentCharacter()[oneAction[1]], oneAction[2]);
+                    characterManager.SetFace(oneAction[1], oneAction[2]);
                     ActionPlay();
                     break;
                 case "퇴장":    //<퇴장, 퇴장할 캐릭터 이름>
@@ -221,25 +221,10 @@ public class LinePrint : MonoBehaviour
             yield return skiper;
         }
     }
+    public void SaveClicked(){
+        dataSet = new DataSet(characterManager.getCharacterList(), scriptIndex, scriptTitle, backgroundManager.backgroundName
+        ,bgmManager.BGMname, SettingManager.instance.mainVolume, SettingManager.instance.esVolume);
 
-    public void SaveClicked(int saveIndex){
-        if(characterManager.currentCharacter.Count == 0){
-            DataSet dataSet = new DataSet(scriptIndex, scriptTitle, backgroundManager.background.name
-            ,bgmManager.BGMname, SettingManager.instance.mainVolume, SettingManager.instance.esVolume);
-
-            saveManager.GameSave(dataSet, saveIndex);
-        }
-        else if(characterManager.currentCharacter.Count == 1){
-            DataSet dataSet = new DataSet(characterManager.characterOne, scriptIndex, scriptTitle, backgroundManager.background.name
-            ,bgmManager.BGMname, SettingManager.instance.mainVolume, SettingManager.instance.esVolume);
-
-            saveManager.GameSave(dataSet, saveIndex);
-        }
-        else if(characterManager.currentCharacter.Count == 2){
-            DataSet dataSet = new DataSet(characterManager.characterOne, characterManager.characterTwo, scriptIndex, scriptTitle, 
-            backgroundManager.background.name ,bgmManager.BGMname, SettingManager.instance.mainVolume, SettingManager.instance.esVolume);
-
-            saveManager.GameSave(dataSet, saveIndex);
-        }
+        saveManager.GameSave(dataSet, EventSystem.current.currentSelectedGameObject.name);
     }
 }

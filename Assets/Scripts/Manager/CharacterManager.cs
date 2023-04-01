@@ -7,8 +7,7 @@ using DG.Tweening;
 public class CharacterManager : MonoBehaviour
 {
     public Dictionary<string, GameObject> currentCharacter = new Dictionary<string, GameObject>();  //현재 존재하는 캐릭터들
-    public List<string> characterOne = new List<string>(); //저장할때 쓰이는 변수
-    public List<string> characterTwo = new List<string>(); //저장할때 쓰이는 변수
+    public List<CharacterSet> characterList = new List<CharacterSet>();
     Object[] faceImageList; //시작할때 불러오는 캐릭터 얼굴 이미지
     Object[] characterImageList;    //시작할때 불러오는 캐릭터 몸통 이미지
     public GameObject character;    //캐릭터 오리지널 형태
@@ -35,25 +34,12 @@ public class CharacterManager : MonoBehaviour
         newActor.transform.GetChild(0).transform.localScale = new Vector3(1, 1, 1);
 
         newActor.GetComponent<Image>().sprite = FindCha(characterName + "_" + characterBody);    //캐릭터의 몸 이미지
-        SetFace(newActor, characterFace);
         currentCharacter[characterName] = newActor.gameObject;
+        SetFace(characterName, characterFace);
         print(characterName);
 
-        if(currentCharacter.Count == 0){
-            characterOne.Add(characterName);
-            characterOne.Add(xpos.ToString());
-            characterOne.Add(ypos.ToString());
-            characterOne.Add(characterBody);
-            characterOne.Add(characterFace);    //저장할때 쓰이는 데이터
-        }
-        else if(currentCharacter.Count == 1){
-            characterTwo.Add(characterName);
-            characterTwo.Add(xpos.ToString());
-            characterTwo.Add(ypos.ToString());
-            characterTwo.Add(characterBody);
-            characterTwo.Add(characterFace);    //저장할때 쓰이는 데이터
-        }
-        
+        characterList.Add(new CharacterSet(characterName, characterBody, characterFace, xpos, ypos));
+        Debug.Log(characterList.Count);
     }
 
     public void FadeIn(string name, string face, string body, float xpos, float ypos, float time)
@@ -114,15 +100,28 @@ public class CharacterManager : MonoBehaviour
         return null;
     }
 
-    public void SetFace(GameObject character, string faceName)
+    public void SetFace(string name, string faceName)
     {
+        GameObject character = getCurrentCharacter()[name];
         character.transform.GetChild(0).GetComponent<Image>().sprite = FindFace(character.name + faceName);
+        for(int i = 0; i < characterList.Count; i++){
+            if(characterList[i].characterName == name){
+                characterList[i].characterFace = faceName;
+            }
+        }
     }
 
     public void CharacterKill(string name)
     {
         Destroy(currentCharacter[name]);
         currentCharacter.Remove(name);
+
+        for(int i = 0; i < characterList.Count; i++){
+            if(characterList[i].characterName == name){
+                characterList.Remove(characterList[i]);
+                break;
+            }
+        }
     }
     public Dictionary<string, GameObject> getCurrentCharacter()
     {
@@ -133,4 +132,14 @@ public class CharacterManager : MonoBehaviour
     {
         currentCharacter = newDict;
     }
-}
+
+    public List<CharacterSet> getCharacterList()
+    {
+        return this.characterList;
+    }
+
+    public void setCharacterList(List<CharacterSet> characterList)
+    {
+        this.characterList = characterList;
+    }
+} 

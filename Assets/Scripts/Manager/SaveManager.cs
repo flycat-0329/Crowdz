@@ -7,14 +7,15 @@ using System.Text;
 public class SaveManager : MonoBehaviour
 {
     string path;
-    public void GameSave(DataSet dataSet, int saveIndex){
+    public void GameSave(DataSet dataSet, string saveIndex){
+        Debug.Log(dataSet.saveCharacterList.Count);
         string jsonData = JsonUtility.ToJson(dataSet);
         Debug.Log(jsonData);
 
         #if UNITY_EDITOR
-        path = Application.dataPath + "/Data/" + "saveData" + saveIndex.ToString() + ".json";
+        path = Application.dataPath + "/Data/" + "saveData" + saveIndex + ".json";
         #elif UNITY_ANDROID
-        path = Application.persistentDataPath + "/Data/" + "saveData" + saveIndex.ToString() + ".json";
+        path = Application.persistentDataPath + "/Data/" + "saveData" + saveIndex + ".json";
         #endif
 
         FileInfo fi = new FileInfo(path);

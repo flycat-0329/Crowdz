@@ -7,12 +7,14 @@ public class BackgroundManager : MonoBehaviour
 {
     public Object[] backgroundList;
     public Image background;    //현재 게임 배경
+    public string backgroundName;
 
     private void Start() {
         backgroundList = Resources.LoadAll("Images/Background");
     }
 
     public void changeBG(string bgName){       //대본에 배경 이름을 넣으면 그 배경으로 바뀌도록 하는 함수
+        backgroundName = bgName;
         background.sprite = FindBG(bgName);     //이미지 자체가 아닌 이미지의 이름으로 이미지를 찾아옴
     }
 
