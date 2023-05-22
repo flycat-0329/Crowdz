@@ -9,7 +9,7 @@ public class BackgroundManager : MonoBehaviour
     public Image background;    //현재 게임 배경
     public string backgroundName;
 
-    private void Start() {
+    private void Awake() {
         backgroundList = Resources.LoadAll("Images/Background");
     }
 

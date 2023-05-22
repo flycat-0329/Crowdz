@@ -14,7 +14,7 @@ public class BGMmanager : MonoBehaviour
     public Slider BGslider;
     //브금 볼륨값 조절 슬라이더
     float textVolume = 1;   //대본에 적혀있는 볼륨값
-    private void Start() {
+    private void Awake() {
         BGMList = Resources.LoadAll("Sounds/BGM");
         BGslider.value = SettingManager.instance.mainVolume;
         bgmVolume();
@@ -33,7 +33,7 @@ public class BGMmanager : MonoBehaviour
         BGaudioSource.Play();               //브금을 다시 틀어줍니다.
     }
 
-    public void playBGM(string name, float scriptVolume, float fadeTime){
+    public void playBGM(string name, float scriptVolume, float fadeTime = 0){
         BGMname = name;
         BGaudioSource.Stop();   //일단 브금을 멈추고
 

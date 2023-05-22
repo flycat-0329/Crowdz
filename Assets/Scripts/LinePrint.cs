@@ -21,28 +21,57 @@ public class LinePrint : MonoBehaviour
     public TextMeshProUGUI mainText;    //대사 나오는 텍스트
     private int scriptIndex = -1;        //현재 몇번째 대사인가, 세이브/로드 구현 시 바뀔 부분
     private float typingSpeed = 0.025f;       //글자 출력 주기
-    private bool onTyping = false;      //글자가 나오는 중인가?
-    private string scriptTitle;
+    private float scriptbgmVolume = 1;
+    private string scriptTitle = "PrintSample.txt";
     public Text t;                      //나중에 없앨거
+    private bool onTyping = false;      //글자가 나오는 중인가?
     int lineActionIndex = 0;            //한 대사 안에서 몇번째 연출을 수행중인가
     bool onTimer = false;               //일시정지중인가?
     bool onAction = false;      //연출 나오는중인가?
     bool onAuto = false;        //오토모드 돌리고있는 중인가?
     bool onSkip = false;        //스킵 돌리는 중인가?
+    bool onInit = false;        //방금 시작했는가?
     List<List<string>> script = new List<List<string>>();   //대사만 모아놓은거
     List<List<List<string>>> action = new List<List<List<string>>>();   //연출만 모아놓은거
     // Start is called before the first frame update
     void Start()
     {
-        KeyValuePair<List<List<string>>, List<List<List<string>>>> a = storyManager.storyFileRead("PrintSample.txt");
-        script = a.Key;
-        action = a.Value;
+        onInit = true;
 
         bgmManager = GameObject.Find("BGAudioSource").GetComponent<BGMmanager>();
         esManager = GameObject.Find("ESAudioSource").GetComponent<ESManager>();
+
+        if (SettingManager.instance.isNewGame == false) //새게임이 아니라면(불러오기라면)
+        {
+            scriptTitle = SettingManager.instance.initDataSet.saveScriptName;   //저장된 대본 이름
+            scriptIndex = SettingManager.instance.initDataSet.saveScriptIndex;  //저장된 대본 위치
+
+            nameText.text = SettingManager.instance.initDataSet.saveCurrentCharacter;   //저장된 시점의 말하는 캐릭터 이름
+            mainText.text = SettingManager.instance.initDataSet.saveDialogue;        //저장된 시점의 대사
+
+            backgroundManager.changeBG(SettingManager.instance.initDataSet.saveBackgroundImage);    //저장된 시점의 배경
+            bgmManager.playBGM(SettingManager.instance.initDataSet.saveBGMName, scriptbgmVolume);   //저장된 시점의 브금
+            SettingManager.instance.mainVolume = SettingManager.instance.initDataSet.saveBGMVolume; //저장된 시점의 볼륨
+            SettingManager.instance.esVolume = SettingManager.instance.initDataSet.saveESVolume;    //저장된 시점의 볼륨22
+
+            for (int i = 0; i < SettingManager.instance.initDataSet.saveCharacterList.Count; i++)
+            {   //저장된 시점의 캐릭터들
+                CharacterSet cha = SettingManager.instance.initDataSet.saveCharacterList[i];
+                characterManager.setCharacter(cha.characterName, cha.characterFace, cha.characterBody, 
+                cha.characterXpos, cha.characterYpos);
+            }
+        }
+
+        KeyValuePair<List<List<string>>, List<List<List<string>>>> a = storyManager.storyFileRead(scriptTitle);
+        script = a.Key;
+        action = a.Value;
+
+        PrintController();
+
+        onInit = false;
     }
     public void NewScript(String scriptName)
-    {  //새로운 대본 파일을 읽어오는 함수(미완성)
+    {  //새로운 대본 파일을 읽어오는 함수
         scriptTitle = scriptName;
         KeyValuePair<List<List<string>>, List<List<List<string>>>> a = storyManager.storyFileRead(scriptName + ".txt");
         script = a.Key;
@@ -61,13 +90,16 @@ public class LinePrint : MonoBehaviour
             onTyping = false;   //대사 출력 애니메이션 스킵
 
             onTimer = false;    //연출 스킵
-            for(int i = 0; i < 10; i++){    //연출 스킵
+            for (int i = 0; i < 10; i++)
+            {    //연출 스킵
                 ActionPlay();
             }
         }
-        else if(onTimer == true){   //대사는 끝났는데 연출은 안 끝났을 때(보통 이런경우는 별로 없음)
+        else if (onTimer == true)
+        {   //대사는 끝났는데 연출은 안 끝났을 때(보통 이런경우는 별로 없음)
             onTimer = false;    //연출 스킵
-            for(int i = 0; i < 10; i++){    //연출 스킵
+            for (int i = 0; i < 10; i++)
+            {    //연출 스킵
                 ActionPlay();
             }
 
@@ -88,7 +120,8 @@ public class LinePrint : MonoBehaviour
     }
     public void ActionPlay()    //클릭했을 때 다음 대사에 맞는 연출을 띄우는 함수
     {
-        if(lineActionIndex < action[scriptIndex].Count){
+        if (lineActionIndex < action[scriptIndex].Count)
+        {
             onAction = true;
             List<string> oneAction = action[scriptIndex][lineActionIndex];
             lineActionIndex += 1;
@@ -96,8 +129,11 @@ public class LinePrint : MonoBehaviour
             switch (oneAction[0])
             {
                 case "등장":    //<등장, 캐릭터 이름, 표정, 자세, x좌표(0 ~ 1), y좌표(0 ~ 1)>
-                    characterManager.setCharacter(oneAction[1], oneAction[2], oneAction[3], 
-                    float.Parse(oneAction[4]), float.Parse(oneAction[5]));
+                    if (onInit == false)
+                    {    //이거 없으면 로드되는 순간에 캐릭터 복제됨
+                        characterManager.setCharacter(oneAction[1], oneAction[2], oneAction[3],
+                        float.Parse(oneAction[4]), float.Parse(oneAction[5]));
+                    }
                     ActionPlay();
                     break;
                 case "표정":    //<표정, 바꿀 캐릭터, 바꿀 표정>
@@ -134,7 +170,8 @@ public class LinePrint : MonoBehaviour
                     float.Parse(oneAction[3]), float.Parse(oneAction[4]));
                     ActionPlay();
                     break;
-                case "브금":        //<브금, 브금 제목, 음량(크게 틀건지 작게 틀건지 / 0 ~ 1), 페이드 아웃 시간(없어도 됨)>
+                case "브금":        //<브금, 브금 제목, 음량(크게 틀건지 작게 틀건지 / 0 ~ 1), 페이드 아웃 시간(기본값 0)>
+                    scriptbgmVolume = float.Parse(oneAction[2]);
                     bgmManager.playBGM(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
@@ -146,21 +183,28 @@ public class LinePrint : MonoBehaviour
                     effectManager.Shake(float.Parse(oneAction[1]), float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
+                case "메일":
+                    storyManager.Mailmake(oneAction[1]);
+                    ActionPlay();
+                    break;
                 case "타이머":      //<타이머, 시간> 
                     onTimer = true;
                     StartCoroutine(Timer(float.Parse(oneAction[1])));
                     break;
                 case "선택지":      //<선택지, 선택지 이름, 옵션1, 옵션2, 옵션3(없어도 됨)>
-                    if(oneAction.Count == 4){
+                    if (oneAction.Count == 4)
+                    {
                         choiceManager.ChoiceAppear(oneAction[1], oneAction[2], oneAction[3]);
                     }
-                    else if(oneAction.Count == 5){
+                    else if (oneAction.Count == 5)
+                    {
                         choiceManager.ChoiceAppear(oneAction[1], oneAction[2], oneAction[3], oneAction[4]);
                     }
                     break;
             }
         }
-        else{
+        else
+        {
             onAction = false;
         }
     }
@@ -183,48 +227,60 @@ public class LinePrint : MonoBehaviour
 
         onTyping = false;
     }
-    private IEnumerator Timer(float time){
+    private IEnumerator Timer(float time)
+    {
         yield return new WaitForSeconds(time);
-        if(onTimer == true){
+        if (onTimer == true)
+        {
             onTimer = false;
             ActionPlay();
         }
     }
-    public void OnAuto(){
+    public void OnAuto()
+    {
         onAuto = !onAuto;
         StartCoroutine(AutoPlaying());
     }
-    public IEnumerator AutoPlaying(){
+    public IEnumerator AutoPlaying()
+    {
         WaitForSeconds auto = new WaitForSeconds(0.7f);       //캐싱(최적화)
         bool aaa = false;
 
-        while(onAuto){
-            if(onAction == false && onTyping == false){
+        while (onAuto)
+        {
+            if (onAction == false && onTyping == false)
+            {
                 aaa = true;
             }
             yield return auto;
-            if(aaa == true){
+            if (aaa == true)
+            {
                 aaa = false;
                 PrintController();
             }
         }
-        
+
     }
-    public void OnSkip(){
+    public void OnSkip()
+    {
         onSkip = !onSkip;
         StartCoroutine(SkipPlaying());
     }
-    public IEnumerator SkipPlaying(){
+    public IEnumerator SkipPlaying()
+    {
         WaitForSeconds skiper = new WaitForSeconds(0.05f);
-        while(onSkip){
+        while (onSkip)
+        {
             PrintController();
             yield return skiper;
         }
     }
-    public void SaveClicked(){
-        dataSet = new DataSet(characterManager.getCharacterList(), scriptIndex, scriptTitle, backgroundManager.backgroundName
-        ,bgmManager.BGMname, SettingManager.instance.mainVolume, SettingManager.instance.esVolume);
+    public void SaveClicked(string index)
+    {
+        dataSet = new DataSet(characterManager.getCharacterList(), mainText.text, nameText.text, scriptIndex - 1, scriptTitle,
+        backgroundManager.backgroundName, bgmManager.BGMname, SettingManager.instance.mainVolume, scriptbgmVolume,
+        SettingManager.instance.esVolume);
 
-        saveManager.GameSave(dataSet, EventSystem.current.currentSelectedGameObject.name);
+        saveManager.GameSave(dataSet, index);
     }
 }

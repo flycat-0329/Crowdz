@@ -16,7 +16,7 @@ public class CharacterManager : MonoBehaviour
     private Sequence fadeInSequence;    //dotween
     private Sequence characterMoveSequence; //dotween
 
-    private void Start()
+    private void Awake()
     {
         faceImageList = Resources.LoadAll("Images/Character/Face");
         characterImageList = Resources.LoadAll("Images/Character/Body");
@@ -67,7 +67,16 @@ public class CharacterManager : MonoBehaviour
     public void CharacterMove(string name, float xpos, float ypos, float time)
     {
         characterMoveSequence = DOTween.Sequence()
-        .Append(currentCharacter[name].transform.DOLocalMove(new Vector3((-0.5f + xpos) * Screen.width, (-0.5f + ypos) * Screen.height, 0), time));
+        .Append(currentCharacter[name].transform.DOLocalMove(new Vector3((-0.5f + xpos) * Screen.width, (-0.5f + ypos) * Screen.height, 0), time))
+        .OnComplete(() => 
+        {
+            foreach(CharacterSet c in characterList){
+                if(c.characterName == name){
+                    c.characterXpos = xpos;
+                    c.characterYpos = ypos;
+                }
+            }
+        });
     }
 
     public Sprite FindFace(string name)

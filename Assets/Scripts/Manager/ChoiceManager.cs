@@ -35,6 +35,7 @@ public class ChoiceManager : MonoBehaviour
         choiceButtons[0].SetActive(true);
         choiceButtons[1].SetActive(true);
         choiceButtons[2].SetActive(true);
+
     }
 
     public void OptionSelected(int index){      //선택지 선택했을 때의 함수
