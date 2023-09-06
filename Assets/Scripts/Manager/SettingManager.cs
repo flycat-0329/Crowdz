@@ -8,8 +8,8 @@ public class SettingManager : MonoBehaviour
     public static SettingManager instance;      //싱글톤
     public float mainVolume = 1;        //메인 볼륨
     public float esVolume = 1;      //효과음 볼륨
+    public bool isNewGame = false;
     public DataSet initDataSet;
-    public bool isNewGame = true;
     public GameObject LoadCanvas;
     void Awake(){
         DontDestroyOnLoad(LoadCanvas);

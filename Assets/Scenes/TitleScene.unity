@@ -286,6 +286,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainVolume: 1
   esVolume: 1
+  isNewGame: 1
   initDataSet:
     saveCharacterList: []
     saveDialogue: 
@@ -297,7 +298,6 @@ MonoBehaviour:
     saveBGMVolume: 0
     saveScriptBGMVolume: 0
     saveESVolume: 0
-  isNewGame: 1
   LoadCanvas: {fileID: 2032561716}
 --- !u!4 &15274009
 Transform:
@@ -383,7 +383,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uCD94\uAC00\uC694\uC18C"
+  m_Text: "\uBA54\uC77C 2\uD654"
 --- !u!222 &136675642
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1524,6 +1524,7 @@ GameObject:
   - component: {fileID: 532794894}
   - component: {fileID: 532794893}
   - component: {fileID: 532794892}
+  - component: {fileID: 532794895}
   m_Layer: 5
   m_Name: ArtworkButton
   m_TagString: Untagged
@@ -1594,7 +1595,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 532794893}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2032561721}
+        m_TargetAssemblyTypeName: LoadManager, Assembly-CSharp
+        m_MethodName: LoadNewGame
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: MailSecond
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &532794893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1633,6 +1646,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 532794890}
   m_CullTransparentMesh: 1
+--- !u!114 &532794895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 532794890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbdd80d5269d65c49bee01b3daf932b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &577501099
 GameObject:
   m_ObjectHideFlags: 0
@@ -4480,16 +4505,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2038064715}
-        m_TargetAssemblyTypeName: SceneLoad, Assembly-CSharp
-        m_MethodName: SceneChange
+      - m_Target: {fileID: 2032561721}
+        m_TargetAssemblyTypeName: LoadManager, Assembly-CSharp
+        m_MethodName: LoadNewGame
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: GameScene
+          m_StringArgument: NewGameData
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &2038064713

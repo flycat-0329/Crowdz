@@ -7,11 +7,10 @@ using DG.Tweening;
 
 public class StoryManager : MonoBehaviour
 {
-    public GameObject mailText;
-    public GameObject mailPanel;
     public KeyValuePair<List<List<string>>, List<List<List<string>>>> storyFileRead(string fileName)
     {
-        StreamReader sr = new StreamReader(Application.dataPath + "/Storys/Script/" + fileName);   //대본 파일(후에 리스트로 관리해야 함)
+        TextAsset ta = Resources.Load("Storys/" + fileName) as TextAsset;   //대본 파일(후에 리스트로 관리해야 함)
+        StringReader sr = new StringReader(ta.text);
         List<List<string>> scriptList = new List<List<string>>();   //전체 대사 리스트
         List<List<List<string>>> actionList = new List<List<List<string>>>();   //전체 연출 리스트
         List<string> scriptLineList = new List<string>();           //대사 한줄을 임시로 저장하는 리스트
@@ -62,17 +61,5 @@ public class StoryManager : MonoBehaviour
         }
     }
 
-    public string MailRead(string mailName){
-        StreamReader sr = new StreamReader(Application.dataPath + "/Storys/Mail/" + mailName + ".txt");
-
-        string mail = sr.ReadToEnd();
-        Debug.Log(mail);
-        return mail;
-    }
-
-    public void Mailmake(string mailName){
-        mailPanel.SetActive(true);
-        string mail = MailRead(mailName);
-        mailText.GetComponent<Text>().text = mail;
-    }
+    
 }

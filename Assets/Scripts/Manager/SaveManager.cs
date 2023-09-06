@@ -54,11 +54,7 @@ public class SaveManager : MonoBehaviour
         string jsonData = JsonUtility.ToJson(dataSet);
         Debug.Log(jsonData);
 
-        #if UNITY_EDITOR
-        path = Application.dataPath + "/Data/" + "saveData" + saveIndex + ".json";
-        #elif UNITY_ANDROID
-        path = Application.persistentDataPath + "/Data/" + "saveData" + saveIndex + ".json";
-        #endif
+        path = Application.dataPath + "/Resources/Data/saveData" + saveIndex;
 
         FileInfo fi = new FileInfo(path);
         if(fi.Exists){

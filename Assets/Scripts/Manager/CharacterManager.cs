@@ -12,8 +12,7 @@ public class CharacterManager : MonoBehaviour
     Object[] characterImageList;    //시작할때 불러오는 캐릭터 몸통 이미지
     public GameObject character;    //캐릭터 오리지널 형태
     public Canvas characterCanvas;  //캐릭터가 있는 캔버스
-    private Sequence fadeOutSequence;   //dotween
-    private Sequence fadeInSequence;    //dotween
+    public EffectManager effectManager;
     private Sequence characterMoveSequence; //dotween
 
     private void Awake()
@@ -48,20 +47,12 @@ public class CharacterManager : MonoBehaviour
         currentCharacter[name].GetComponent<Image>().color = new Color(255, 255, 255, 0);
         currentCharacter[name].transform.GetChild(0).GetComponent<Image>().color = new Color(255, 255, 255, 0);
 
-        fadeInSequence = DOTween.Sequence()
-        .Append(currentCharacter[name].GetComponent<Image>().DOFade(1.0f, time))
-        .Join(currentCharacter[name].transform.GetChild(0).GetComponent<Image>().DOFade(1.0f, time));
+        effectManager.FadeInCharacter(currentCharacter[name], time);
     }
 
     public void FadeOut(string name, float time)
     {
-        fadeOutSequence = DOTween.Sequence()
-        .Append(currentCharacter[name].GetComponent<Image>().DOFade(0, time))
-        .Join(currentCharacter[name].transform.GetChild(0).GetComponent<Image>().DOFade(0, time))
-        .OnComplete(() =>
-        {
-            CharacterKill(name);
-        });
+        effectManager.FadeOutCharacter(currentCharacter[name], time);
     }
 
     public void CharacterMove(string name, float xpos, float ypos, float time)

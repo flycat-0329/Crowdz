@@ -8,6 +8,7 @@ using DG.Tweening;
 using UnityEngine.EventSystems;
 public class LinePrint : MonoBehaviour
 {
+    public LogManager logManager;
     public StoryManager storyManager;
     public CharacterManager characterManager;
     public BackgroundManager backgroundManager;
@@ -22,11 +23,11 @@ public class LinePrint : MonoBehaviour
     private int scriptIndex = -1;        //현재 몇번째 대사인가, 세이브/로드 구현 시 바뀔 부분
     private float typingSpeed = 0.025f;       //글자 출력 주기
     private float scriptbgmVolume = 1;
-    private string scriptTitle = "PrintSample.txt";
+    private string scriptTitle;
     public Text t;                      //나중에 없앨거
     private bool onTyping = false;      //글자가 나오는 중인가?
     int lineActionIndex = 0;            //한 대사 안에서 몇번째 연출을 수행중인가
-    bool onTimer = false;               //일시정지중인가?
+    // bool onTimer = false;               //일시정지중인가?
     bool onAction = false;      //연출 나오는중인가?
     bool onAuto = false;        //오토모드 돌리고있는 중인가?
     bool onSkip = false;        //스킵 돌리는 중인가?
@@ -41,8 +42,6 @@ public class LinePrint : MonoBehaviour
         bgmManager = GameObject.Find("BGAudioSource").GetComponent<BGMmanager>();
         esManager = GameObject.Find("ESAudioSource").GetComponent<ESManager>();
 
-        if (SettingManager.instance.isNewGame == false) //새게임이 아니라면(불러오기라면)
-        {
             scriptTitle = SettingManager.instance.initDataSet.saveScriptName;   //저장된 대본 이름
             scriptIndex = SettingManager.instance.initDataSet.saveScriptIndex;  //저장된 대본 위치
 
@@ -50,30 +49,31 @@ public class LinePrint : MonoBehaviour
             mainText.text = SettingManager.instance.initDataSet.saveDialogue;        //저장된 시점의 대사
 
             backgroundManager.changeBG(SettingManager.instance.initDataSet.saveBackgroundImage);    //저장된 시점의 배경
-            bgmManager.playBGM(SettingManager.instance.initDataSet.saveBGMName, scriptbgmVolume);   //저장된 시점의 브금
-            SettingManager.instance.mainVolume = SettingManager.instance.initDataSet.saveBGMVolume; //저장된 시점의 볼륨
-            SettingManager.instance.esVolume = SettingManager.instance.initDataSet.saveESVolume;    //저장된 시점의 볼륨22
+            SettingManager.instance.mainVolume = SettingManager.instance.initDataSet.saveBGMVolume; //저장된 시점의 브금 볼륨
+            scriptbgmVolume = SettingManager.instance.initDataSet.saveScriptBGMVolume;              //저장된 시점의 브금 볼륨(대본상)
+            SettingManager.instance.esVolume = SettingManager.instance.initDataSet.saveESVolume;    //저장된 시점의 효과음 볼륨
+            bgmManager.playBGM(SettingManager.instance.initDataSet.saveBGMName, scriptbgmVolume);   //저장된 시점의 브금 이름
 
-            for (int i = 0; i < SettingManager.instance.initDataSet.saveCharacterList.Count; i++)
-            {   //저장된 시점의 캐릭터들
+            for (int i = 0; i < SettingManager.instance.initDataSet.saveCharacterList.Count; i++)   //저장된 시점의 캐릭터들
+            {
                 CharacterSet cha = SettingManager.instance.initDataSet.saveCharacterList[i];
-                characterManager.setCharacter(cha.characterName, cha.characterFace, cha.characterBody, 
+                characterManager.setCharacter(cha.characterName, cha.characterFace, cha.characterBody,
                 cha.characterXpos, cha.characterYpos);
             }
-        }
 
-        KeyValuePair<List<List<string>>, List<List<List<string>>>> a = storyManager.storyFileRead(scriptTitle);
-        script = a.Key;
-        action = a.Value;
-
+            Debug.Log(scriptTitle);
+            KeyValuePair<List<List<string>>, List<List<List<string>>>> a = storyManager.storyFileRead(scriptTitle);
+            script = a.Key;
+            action = a.Value;
+        
         PrintController();
 
         onInit = false;
     }
-    public void NewScript(String scriptName)
-    {  //새로운 대본 파일을 읽어오는 함수
+    public void NewScript(String scriptName)        //새로운 대본 파일을 읽어오는 함수
+    {
         scriptTitle = scriptName;
-        KeyValuePair<List<List<string>>, List<List<List<string>>>> a = storyManager.storyFileRead(scriptName + ".txt");
+        KeyValuePair<List<List<string>>, List<List<List<string>>>> a = storyManager.storyFileRead(scriptName);
         script = a.Key;
         action = a.Value;
 
@@ -89,33 +89,39 @@ public class LinePrint : MonoBehaviour
         {
             onTyping = false;   //대사 출력 애니메이션 스킵
 
-            onTimer = false;    //연출 스킵
-            for (int i = 0; i < 10; i++)
-            {    //연출 스킵
-                ActionPlay();
-            }
-        }
-        else if (onTimer == true)
-        {   //대사는 끝났는데 연출은 안 끝났을 때(보통 이런경우는 별로 없음)
-            onTimer = false;    //연출 스킵
+            // onTimer = false;    //연출 스킵
             for (int i = 0; i < 10; i++)
             {    //연출 스킵
                 ActionPlay();
             }
 
-            scriptIndex += 1;   //대사 출력중이 아니라면 다음 대사로
-            lineActionIndex = 0;    //연출도 다음 대사의 첫번째 연출부터 진행되도록
-            ActionPlay();   //다음 대사 연출 시작
-            nameText.text = script[scriptIndex][1];     //이름 변경
-            StartCoroutine(PrintLine(script[scriptIndex][2]));  //대사 출력
+            DOTween.KillAll(true);
         }
-        else
+
+        // else if (onTimer == true)
+        // {   //대사는 끝났는데 연출은 안 끝났을 때(보통 이런경우는 별로 없음)
+        //     onTimer = false;    //연출 스킵
+        //     for (int i = 0; i < 10; i++)
+        //     {    //연출 스킵
+        //         ActionPlay();
+        //         effectManager.SequenceKill();
+        //     }
+
+        //     scriptIndex += 1;   //대사 출력중이 아니라면 다음 대사로
+        //     lineActionIndex = 0;    //연출도 다음 대사의 첫번째 연출부터 진행되도록
+        //     ActionPlay();   //다음 대사 연출 시작
+        //     nameText.text = script[scriptIndex][1];     //이름 변경
+        //     StartCoroutine(PrintLine(script[scriptIndex][2]));  //대사 출력
+        // }
+
+        else    //대사 출력중이 아니라면 다음 대사로
         {
-            scriptIndex += 1;   //대사 출력중이 아니라면 다음 대사로
+            scriptIndex += 1;
             lineActionIndex = 0;    //연출도 그 대사의 첫번째 연출부터 진행되도록
             ActionPlay();   //다음 대사 연출 시작
             nameText.text = script[scriptIndex][1];     //이름 변경
             StartCoroutine(PrintLine(script[scriptIndex][2]));  //대사 출력
+            logManager.LogMaker(script[scriptIndex][1], script[scriptIndex][2]);
         }
     }
     public void ActionPlay()    //클릭했을 때 다음 대사에 맞는 연출을 띄우는 함수
@@ -183,14 +189,10 @@ public class LinePrint : MonoBehaviour
                     effectManager.Shake(float.Parse(oneAction[1]), float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
-                case "메일":
-                    storyManager.Mailmake(oneAction[1]);
-                    ActionPlay();
-                    break;
-                case "타이머":      //<타이머, 시간> 
-                    onTimer = true;
-                    StartCoroutine(Timer(float.Parse(oneAction[1])));
-                    break;
+                // case "타이머":      //<타이머, 시간> 
+                //     onTimer = true;
+                //     StartCoroutine(Timer(float.Parse(oneAction[1])));
+                //     break;
                 case "선택지":      //<선택지, 선택지 이름, 옵션1, 옵션2, 옵션3(없어도 됨)>
                     if (oneAction.Count == 4)
                     {
@@ -227,15 +229,15 @@ public class LinePrint : MonoBehaviour
 
         onTyping = false;
     }
-    private IEnumerator Timer(float time)
-    {
-        yield return new WaitForSeconds(time);
-        if (onTimer == true)
-        {
-            onTimer = false;
-            ActionPlay();
-        }
-    }
+    // private IEnumerator Timer(float time)
+    // {
+    //     yield return new WaitForSeconds(time);
+    //     if (onTimer == true)
+    //     {
+    //         onTimer = false;
+    //         ActionPlay();
+    //     }
+    // }
     public void OnAuto()
     {
         onAuto = !onAuto;
@@ -268,7 +270,7 @@ public class LinePrint : MonoBehaviour
     }
     public IEnumerator SkipPlaying()
     {
-        WaitForSeconds skiper = new WaitForSeconds(0.05f);
+        WaitForSeconds skiper = new WaitForSeconds(0.02f);
         while (onSkip)
         {
             PrintController();
