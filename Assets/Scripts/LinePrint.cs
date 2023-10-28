@@ -42,30 +42,36 @@ public class LinePrint : MonoBehaviour
         bgmManager = GameObject.Find("BGAudioSource").GetComponent<BGMmanager>();
         esManager = GameObject.Find("ESAudioSource").GetComponent<ESManager>();
 
-            scriptTitle = SettingManager.instance.initDataSet.saveScriptName;   //저장된 대본 이름
-            scriptIndex = SettingManager.instance.initDataSet.saveScriptIndex;  //저장된 대본 위치
+        scriptTitle = SettingManager.instance.initDataSet.saveScriptName;   //저장된 대본 이름
+        scriptIndex = SettingManager.instance.initDataSet.saveScriptIndex;  //저장된 대본 위치
 
-            nameText.text = SettingManager.instance.initDataSet.saveCurrentCharacter;   //저장된 시점의 말하는 캐릭터 이름
-            mainText.text = SettingManager.instance.initDataSet.saveDialogue;        //저장된 시점의 대사
+        nameText.text = SettingManager.instance.initDataSet.saveCurrentCharacter;   //저장된 시점의 말하는 캐릭터 이름
+        mainText.text = SettingManager.instance.initDataSet.saveDialogue;        //저장된 시점의 대사
 
-            backgroundManager.changeBG(SettingManager.instance.initDataSet.saveBackgroundImage);    //저장된 시점의 배경
-            SettingManager.instance.mainVolume = SettingManager.instance.initDataSet.saveBGMVolume; //저장된 시점의 브금 볼륨
-            scriptbgmVolume = SettingManager.instance.initDataSet.saveScriptBGMVolume;              //저장된 시점의 브금 볼륨(대본상)
-            SettingManager.instance.esVolume = SettingManager.instance.initDataSet.saveESVolume;    //저장된 시점의 효과음 볼륨
-            bgmManager.playBGM(SettingManager.instance.initDataSet.saveBGMName, scriptbgmVolume);   //저장된 시점의 브금 이름
+        if(SettingManager.instance.initDataSet.saveIsAnim){
+            backgroundManager.BackgroundAnimOn(SettingManager.instance.initDataSet.saveBackgroundImage);    //저장된 시점의 애니메이션
+        }
+        else{
+            backgroundManager.BackgroundImageOn(SettingManager.instance.initDataSet.saveBackgroundImage);    //저장된 시점의 배경
+        }
 
-            for (int i = 0; i < SettingManager.instance.initDataSet.saveCharacterList.Count; i++)   //저장된 시점의 캐릭터들
-            {
-                CharacterSet cha = SettingManager.instance.initDataSet.saveCharacterList[i];
-                characterManager.setCharacter(cha.characterName, cha.characterFace, cha.characterBody,
-                cha.characterXpos, cha.characterYpos);
-            }
+        SettingManager.instance.mainVolume = SettingManager.instance.initDataSet.saveBGMVolume; //저장된 시점의 브금 볼륨
+        scriptbgmVolume = SettingManager.instance.initDataSet.saveScriptBGMVolume;              //저장된 시점의 브금 볼륨(대본상)
+        SettingManager.instance.esVolume = SettingManager.instance.initDataSet.saveESVolume;    //저장된 시점의 효과음 볼륨
+        bgmManager.playBGM(SettingManager.instance.initDataSet.saveBGMName, scriptbgmVolume);   //저장된 시점의 브금 이름
 
-            Debug.Log(scriptTitle);
-            KeyValuePair<List<List<string>>, List<List<List<string>>>> a = storyManager.storyFileRead(scriptTitle);
-            script = a.Key;
-            action = a.Value;
-        
+        for (int i = 0; i < SettingManager.instance.initDataSet.saveCharacterList.Count; i++)   //저장된 시점의 캐릭터들
+        {
+            CharacterSet cha = SettingManager.instance.initDataSet.saveCharacterList[i];
+            characterManager.setCharacter(cha.characterName, cha.characterFace, cha.characterBody,
+            cha.characterXpos, cha.characterYpos);
+        }
+
+        Debug.Log(scriptTitle);
+        KeyValuePair<List<List<string>>, List<List<List<string>>>> a = storyManager.storyFileRead(scriptTitle);
+        script = a.Key;
+        action = a.Value;
+    
         PrintController();
 
         onInit = false;
@@ -151,7 +157,7 @@ public class LinePrint : MonoBehaviour
                     ActionPlay();
                     break;
                 case "배경":    //<배경, 배경이름>
-                    backgroundManager.changeBG(oneAction[1]);
+                    backgroundManager.BackgroundImageOn(oneAction[1]);
                     ActionPlay();
                     break;
                 case "속도":    //<속도, 타이핑 속도>
@@ -188,6 +194,9 @@ public class LinePrint : MonoBehaviour
                 case "흔들":        //<흔들, 시간, 강도>
                     effectManager.Shake(float.Parse(oneAction[1]), float.Parse(oneAction[2]));
                     ActionPlay();
+                    break;
+                case "애니메이션":
+                    backgroundManager.BackgroundAnimOn(oneAction[1]);
                     break;
                 // case "타이머":      //<타이머, 시간> 
                 //     onTimer = true;
@@ -279,7 +288,7 @@ public class LinePrint : MonoBehaviour
     }
     public void SaveClicked(string index)
     {
-        dataSet = new DataSet(characterManager.getCharacterList(), mainText.text, nameText.text, scriptIndex - 1, scriptTitle,
+        dataSet = new DataSet(characterManager.getCharacterList(), backgroundManager.isAnim, mainText.text, nameText.text, scriptIndex - 1, scriptTitle,
         backgroundManager.backgroundName, bgmManager.BGMname, SettingManager.instance.mainVolume, scriptbgmVolume,
         SettingManager.instance.esVolume);
 

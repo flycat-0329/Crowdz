@@ -44,11 +44,15 @@ public class StoryManager : MonoBehaviour
                 lineArray.Add(index.ToString());    //맨 앞에 인덱스 추가
                 scriptLineList = new List<string>(line.Split(':'));     //사람 이름과 대사를 나눈 것
 
+                for(int i = 0; i < scriptLineList.Count; i++){
+                    scriptLineList[i] = scriptLineList[i].Trim();
+                }
+
                 if (scriptLineList.Count == 1)
                 {   //나레이션이라면
                     scriptLineList.Clear();
                     scriptLineList.Add("");
-                    scriptLineList.Add(line);
+                    scriptLineList.Add(line.Trim());
                 }
 
                 lineArray.AddRange(scriptLineList);     //본문과 인덱스를 합침

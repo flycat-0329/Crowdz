@@ -7,15 +7,28 @@ public class BackgroundManager : MonoBehaviour
 {
     public Object[] backgroundList;
     public Image background;    //현재 게임 배경
+    public GameObject backgroundAnimImage;
     public string backgroundName;
+    public bool isAnim;
 
     private void Awake() {
         backgroundList = Resources.LoadAll("Images/Background");
     }
 
-    public void changeBG(string bgName){       //대본에 배경 이름을 넣으면 그 배경으로 바뀌도록 하는 함수
+    public void BackgroundImageOn(string bgName){       //대본에 배경 이름을 넣으면 그 배경으로 바뀌도록 하는 함수
+        isAnim = false;
+        backgroundAnimImage.SetActive(false);
+        background.gameObject.SetActive(true);
         backgroundName = bgName;
         background.sprite = FindBG(bgName);     //이미지 자체가 아닌 이미지의 이름으로 이미지를 찾아옴
+    }
+
+    public void BackgroundAnimOn(string animName){
+        isAnim = true;
+        background.gameObject.SetActive(false);
+        backgroundAnimImage.SetActive(true);
+        backgroundName = animName;
+        backgroundAnimImage.GetComponent<Animator>().Play(animName);
     }
 
     Sprite FindBG(string name){         //이미지의 이름을 받아서 이미지를 리턴하는 함수
