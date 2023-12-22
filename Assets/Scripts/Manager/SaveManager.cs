@@ -54,7 +54,7 @@ public class SaveManager : MonoBehaviour
         string jsonData = JsonUtility.ToJson(dataSet);
         Debug.Log(jsonData);
 
-        path = Application.dataPath + "/Resources/Data/saveData" + saveIndex;
+        path = Application.persistentDataPath + "saveData" + saveIndex + ".json";
 
         FileInfo fi = new FileInfo(path);
         if(fi.Exists){

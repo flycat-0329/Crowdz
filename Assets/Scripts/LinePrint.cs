@@ -18,12 +18,15 @@ public class LinePrint : MonoBehaviour
     public ChoiceManager choiceManager;
     public SaveManager saveManager;
     public DataSet dataSet;
+    public CanvasOnOff canvasOnOff;
     public TextMeshProUGUI nameText;    //이름 나오는 텍스트
-    public TextMeshProUGUI mainText;    //대사 나오는 텍스트
+    public TextMeshProUGUI mainText;    //지금 대사 나오는 텍스트
+    public List<GameObject> mainTextList;   //대사 나오는 텍스트들(아래, 가운데)
+    public GameObject scriptCanvas;     //UI 있는 캔버스
     private int scriptIndex = -1;        //현재 몇번째 대사인가, 세이브/로드 구현 시 바뀔 부분
     private float typingSpeed = 0.025f;       //글자 출력 주기
     private float scriptbgmVolume = 1;
-    private string scriptTitle;
+    private string scriptTitle;         //현제 대본 이름
     public Text t;                      //나중에 없앨거
     private bool onTyping = false;      //글자가 나오는 중인가?
     int lineActionIndex = 0;            //한 대사 안에서 몇번째 연출을 수행중인가
@@ -63,8 +66,16 @@ public class LinePrint : MonoBehaviour
         for (int i = 0; i < SettingManager.instance.initDataSet.saveCharacterList.Count; i++)   //저장된 시점의 캐릭터들
         {
             CharacterSet cha = SettingManager.instance.initDataSet.saveCharacterList[i];
-            characterManager.setCharacter(cha.characterName, cha.characterFace, cha.characterBody,
+            if(cha.characterEffect == ""){
+                Debug.Log("이펙트 없음.");
+                characterManager.setCharacter(cha.characterName, cha.characterBody,
             cha.characterXpos, cha.characterYpos);
+            }
+            else{
+                characterManager.setCharacter(cha.characterName, cha.characterEffect, cha.characterBody,
+            cha.characterXpos, cha.characterYpos);
+            }
+            
         }
 
         Debug.Log(scriptTitle);
@@ -76,6 +87,7 @@ public class LinePrint : MonoBehaviour
 
         onInit = false;
     }
+
     public void NewScript(String scriptName)        //새로운 대본 파일을 읽어오는 함수
     {
         scriptTitle = scriptName;
@@ -101,7 +113,7 @@ public class LinePrint : MonoBehaviour
                 ActionPlay();
             }
 
-            DOTween.KillAll(true);
+            DOTween.KillAll(true, new string[] {"fadeImage"});
         }
 
         // else if (onTimer == true)
@@ -140,16 +152,25 @@ public class LinePrint : MonoBehaviour
 
             switch (oneAction[0])
             {
-                case "등장":    //<등장, 캐릭터 이름, 표정, 자세, x좌표(0 ~ 1), y좌표(0 ~ 1)>
-                    if (onInit == false)
-                    {    //이거 없으면 로드되는 순간에 캐릭터 복제됨
+                case "등장":    //<등장, 캐릭터 이름, (표정), 자세, x좌표(0 ~ 1), y좌표(0 ~ 1)>
+                    if(onInit){
+                        break;
+                    }   
+                    if(oneAction.Count == 6){
                         characterManager.setCharacter(oneAction[1], oneAction[2], oneAction[3],
                         float.Parse(oneAction[4]), float.Parse(oneAction[5]));
                     }
+                    else if(oneAction.Count == 5){
+                        characterManager.setCharacter(oneAction[1], oneAction[2],
+                        float.Parse(oneAction[3]), float.Parse(oneAction[4]));
+                    }
                     ActionPlay();
                     break;
-                case "표정":    //<표정, 바꿀 캐릭터, 바꿀 표정>
-                    characterManager.SetFace(oneAction[1], oneAction[2]);
+                case "이펙트":    //<이펙트, 바꿀 캐릭터, 넣을 이펙트>
+                    if(onInit){
+                        break;
+                    }
+                    characterManager.SetEffect(oneAction[1], oneAction[2]);
                     ActionPlay();
                     break;
                 case "퇴장":    //<퇴장, 퇴장할 캐릭터 이름>
@@ -168,13 +189,29 @@ public class LinePrint : MonoBehaviour
                     mainText.fontSize = Int32.Parse(oneAction[1]);
                     ActionPlay();
                     break;
+                case "색깔":    //<색깔, R, G, B, A>
+                    mainText.color = new Color(float.Parse(oneAction[1]), float.Parse(oneAction[2]), float.Parse(oneAction[3]), float.Parse(oneAction[4]));
+                    break;
                 case "페이드아웃":    //<페이드아웃, 캐릭터, 시간>
                     characterManager.FadeOut(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
-                case "페이드인":    //<페이드인, 캐릭터, 표정, 자세, x좌표(0 ~ 1), y좌표(0 ~ 1), 시간>
-                    characterManager.FadeIn(oneAction[1], oneAction[2], oneAction[3], float.Parse(oneAction[4]),
-                    float.Parse(oneAction[5]), float.Parse(oneAction[6]));
+                case "페이드퇴장":
+                    characterManager.FadeOutMove(oneAction[1], float.Parse(oneAction[2]), float.Parse(oneAction[3]), float.Parse(oneAction[4]));
+                    ActionPlay();
+                    break;
+                case "페이드인":    //<페이드인, 캐릭터, (이펙트), 자세, x좌표(0 ~ 1), y좌표(0 ~ 1), 시간>
+                    if(onInit){
+                        break;
+                    }
+                    if(oneAction.Count == 7){
+                        characterManager.FadeIn(oneAction[1], oneAction[2], oneAction[3], float.Parse(oneAction[4]),
+                        float.Parse(oneAction[5]), float.Parse(oneAction[6]));
+                    }
+                    else if(oneAction.Count == 6){
+                        characterManager.FadeIn(oneAction[1], oneAction[2], float.Parse(oneAction[3]),
+                        float.Parse(oneAction[4]), float.Parse(oneAction[5]));
+                    }
                     ActionPlay();
                     break;
                 case "이동":        //<이동, 캐릭터, x좌표(0 ~ 1), y좌표(0 ~ 1), 시간>
@@ -195,13 +232,30 @@ public class LinePrint : MonoBehaviour
                     effectManager.Shake(float.Parse(oneAction[1]), float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
-                case "애니메이션":
+                case "애니메이션":  //<애니메이션, 애니메이션 이름>
                     backgroundManager.BackgroundAnimOn(oneAction[1]);
+                    ActionPlay();
                     break;
-                // case "타이머":      //<타이머, 시간> 
-                //     onTimer = true;
-                //     StartCoroutine(Timer(float.Parse(oneAction[1])));
-                //     break;
+                case "사진페이드":  //<사진페이드, 사진 이름>
+                    effectManager.fadeImageEffect(oneAction[1]);
+                    ActionPlay();
+                    break;
+                case "사진등장":    //<사진등장, 사진 이름, 등장 페이드 시간>
+                    effectManager.EffectImageOn(oneAction[1], float.Parse(oneAction[2]));
+                    ActionPlay();
+                    break;
+                case "사진이동":    //<사진이동, x좌표, y좌표, 이동시간>
+                    effectManager.EffectImageMove(float.Parse(oneAction[1]), float.Parse(oneAction[2]), float.Parse(oneAction[3]));
+                    ActionPlay();
+                    break;
+                case "사진퇴장":
+                    effectManager.EffectImageOff(float.Parse(oneAction[1]));
+                    ActionPlay();
+                    break;
+                case "다음챕터":    //<다음챕터, 파일 이름>
+                    NewScript(oneAction[1]);
+                    PrintController();
+                    break;
                 case "선택지":      //<선택지, 선택지 이름, 옵션1, 옵션2, 옵션3(없어도 됨)>
                     if (oneAction.Count == 4)
                     {
@@ -211,6 +265,31 @@ public class LinePrint : MonoBehaviour
                     {
                         choiceManager.ChoiceAppear(oneAction[1], oneAction[2], oneAction[3], oneAction[4]);
                     }
+                    break;
+                case "바운스":  //캐릭터 위아래 떨림
+                    characterManager.characterBounce(oneAction[1]);
+                    ActionPlay();
+                    break;
+                case "확대":    //<캐릭터, 크기, 시간>
+                    characterManager.CharacterSize(oneAction[1], float.Parse(oneAction[2]), float.Parse(oneAction[3]));
+                    ActionPlay();
+                    break;
+                case "UI숨김":  //<UI숨김>
+                    canvasOnOff.canvasOnOff(scriptCanvas);
+                    ActionPlay();
+                    break;
+                case "타이머":  //<타이머, 시간>
+                    StartCoroutine(Timer(float.Parse(oneAction[1])));
+                    break;
+                case "대사위치":    //<대사위치, 가운데/아래>
+                    effectManager.centerUISwitch();
+                    if(oneAction[1] == "가운데"){
+                        mainText = mainTextList[1].GetComponent<TextMeshProUGUI>();
+                    }
+                    else if(oneAction[1] == "아래"){
+                        mainText = mainTextList[0].GetComponent<TextMeshProUGUI>();
+                    }
+                    ActionPlay();
                     break;
             }
         }
@@ -238,15 +317,10 @@ public class LinePrint : MonoBehaviour
 
         onTyping = false;
     }
-    // private IEnumerator Timer(float time)
-    // {
-    //     yield return new WaitForSeconds(time);
-    //     if (onTimer == true)
-    //     {
-    //         onTimer = false;
-    //         ActionPlay();
-    //     }
-    // }
+    private IEnumerator Timer(float time){
+        yield return new WaitForSeconds(time);
+        ActionPlay();
+    }
     public void OnAuto()
     {
         onAuto = !onAuto;
@@ -279,7 +353,7 @@ public class LinePrint : MonoBehaviour
     }
     public IEnumerator SkipPlaying()
     {
-        WaitForSeconds skiper = new WaitForSeconds(0.02f);
+        WaitForSeconds skiper = new WaitForSeconds(0.05f);
         while (onSkip)
         {
             PrintController();

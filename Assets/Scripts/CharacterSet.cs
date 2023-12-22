@@ -8,14 +8,21 @@ public class CharacterSet
 {
     public string characterName;
     public string characterBody;
-    public string characterFace;
+    public string characterEffect;
     public float characterXpos;
     public float characterYpos;
 
-    public CharacterSet(string name, string body, string face, float xpos, float ypos){
+    public CharacterSet(string name, string body, string effect, float xpos, float ypos){
         characterName = name;
         characterBody = body;
-        characterFace = face;
+        characterEffect = effect;
+        characterXpos = xpos;
+        characterYpos = ypos;
+    }
+
+    public CharacterSet(string name, string body, float xpos, float ypos){
+        characterName = name;
+        characterBody = body;
         characterXpos = xpos;
         characterYpos = ypos;
     }

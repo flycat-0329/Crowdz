@@ -24,7 +24,6 @@ public class BGMmanager : MonoBehaviour
         BGaudioSource.Stop();   //일단 브금을 멈추고
 
         AudioClip bgAudio = findBGM(name);  //브금 이름으로 BGAudioClips에서 브금을 찾아옴
-
         
         BGaudioSource.clip = bgAudio;       //노래를 바꾸고
         BGaudioSource.volume = SettingManager.instance.mainVolume * scriptVolume;

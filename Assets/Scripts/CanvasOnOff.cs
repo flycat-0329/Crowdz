@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CanvasOnOff : MonoBehaviour
 {
-    public void canvasOnOff(GameObject canvas)
+    public void canvasOnOff(GameObject canvas)      //UI숨기면 LinePrint에서 다시 켬
     {
         canvas.SetActive(!canvas.activeSelf);
     }

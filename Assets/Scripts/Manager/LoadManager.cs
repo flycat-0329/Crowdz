@@ -68,7 +68,7 @@ public class LoadManager : MonoBehaviour
     public void LoadGame(string index)
     {
         SettingManager.instance.isNewGame = false;
-        path = Application.dataPath + "/Resources/Data/saveData" + index;
+        path = Application.persistentDataPath + "saveData" + index + ".json";
 
         FileStream fileStream = new FileStream(path, FileMode.Open);
         byte[] data = new byte[fileStream.Length];

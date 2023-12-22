@@ -10,4 +10,5 @@ public class UIHide : MonoBehaviour
             scriptCanvas.SetActive(true);
         }
     }
+
 }
