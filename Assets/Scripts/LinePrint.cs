@@ -15,6 +15,7 @@ public class LinePrint : MonoBehaviour
     public BGMmanager bgmManager;
     public ESManager esManager;
     public EffectManager effectManager;
+    public ImageEffectManager imageEffectManager;
     public ChoiceManager choiceManager;
     public SaveManager saveManager;
     public DataSet dataSet;
@@ -87,6 +88,7 @@ public class LinePrint : MonoBehaviour
 
         onInit = false;
     }
+
 
     public void NewScript(String scriptName)        //새로운 대본 파일을 읽어오는 함수
     {
@@ -182,7 +184,7 @@ public class LinePrint : MonoBehaviour
                     ActionPlay();
                     break;
                 case "속도":    //<속도, 타이핑 속도>
-                    typingSpeed = int.Parse(oneAction[1]);
+                    typingSpeed = float.Parse(oneAction[1]);
                     ActionPlay();
                     break;
                 case "크기":    //<크기, 글자 크기>
@@ -237,19 +239,19 @@ public class LinePrint : MonoBehaviour
                     ActionPlay();
                     break;
                 case "사진페이드":  //<사진페이드, 사진 이름>
-                    effectManager.fadeImageEffect(oneAction[1]);
+                    imageEffectManager.fadeImageEffect(oneAction[1]);
                     ActionPlay();
                     break;
                 case "사진등장":    //<사진등장, 사진 이름, 등장 페이드 시간>
-                    effectManager.EffectImageOn(oneAction[1], float.Parse(oneAction[2]));
+                    imageEffectManager.EffectImageOn(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
                 case "사진이동":    //<사진이동, x좌표, y좌표, 이동시간>
-                    effectManager.EffectImageMove(float.Parse(oneAction[1]), float.Parse(oneAction[2]), float.Parse(oneAction[3]));
+                    imageEffectManager.EffectImageMove(float.Parse(oneAction[1]), float.Parse(oneAction[2]), float.Parse(oneAction[3]));
                     ActionPlay();
                     break;
-                case "사진퇴장":
-                    effectManager.EffectImageOff(float.Parse(oneAction[1]));
+                case "사진퇴장":    //<사진퇴장, 사진 이름, 퇴장 페이드 시간>
+                    imageEffectManager.EffectImageOff(float.Parse(oneAction[1]));
                     ActionPlay();
                     break;
                 case "다음챕터":    //<다음챕터, 파일 이름>
@@ -289,6 +291,11 @@ public class LinePrint : MonoBehaviour
                     else if(oneAction[1] == "아래"){
                         mainText = mainTextList[0].GetComponent<TextMeshProUGUI>();
                     }
+                    ActionPlay();
+                    break;
+                case "화면페이드":  //<화면페이드, r, g, b, a, 시간>
+                    effectManager.FadeAll(float.Parse(oneAction[1]), float.Parse(oneAction[2]), 
+                    float.Parse(oneAction[3]), float.Parse(oneAction[4]), float.Parse(oneAction[5]));
                     ActionPlay();
                     break;
             }

@@ -12,7 +12,7 @@ public class CharacterManager : MonoBehaviour
     Object[] characterImageList;    //시작할때 불러오는 캐릭터 몸통 이미지
     public GameObject character;    //캐릭터 오리지널 형태
     public Canvas characterCanvas;  //캐릭터가 있는 캔버스
-    public EffectManager effectManager;
+    public CharacterEffectManager characterEffectManager;
     private Sequence characterMoveSequence; //dotween
 
     private void Awake()
@@ -68,7 +68,7 @@ public class CharacterManager : MonoBehaviour
         currentCharacter[name].transform.GetChild(1).GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
         currentCharacter[name].transform.GetChild(0).GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
 
-        effectManager.FadeInCharacter(currentCharacter[name], time);
+        characterEffectManager.FadeInCharacter(currentCharacter[name], time);
     }
 
     public void FadeIn(string name, string body, float xpos, float ypos, float time)
@@ -77,24 +77,24 @@ public class CharacterManager : MonoBehaviour
         currentCharacter[name].transform.GetChild(1).GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
         currentCharacter[name].transform.GetChild(0).GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
 
-        effectManager.FadeInCharacter(currentCharacter[name], time);
+        characterEffectManager.FadeInCharacter(currentCharacter[name], time);
     }
 
     public void FadeOut(string name, float time)
     {
-        effectManager.FadeOutCharacter(currentCharacter[name], time);
+        characterEffectManager.FadeOutCharacter(currentCharacter[name], time);
     }
 
     public void FadeOutMove(string name, float xpos, float ypos, float time){
-        effectManager.FadeOutMoveCharacter(currentCharacter[name], xpos, ypos, time);
+        characterEffectManager.FadeOutMoveCharacter(currentCharacter[name], xpos, ypos, time);
     }
 
     public void characterBounce(string name){
-        effectManager.CharacterBounce(currentCharacter[name]);
+        characterEffectManager.CharacterBounce(currentCharacter[name]);
     }
 
     public void CharacterSize(string name, float size, float time){
-        effectManager.CharacterSize(currentCharacter[name], new Vector3(size, size, 1), time);
+        characterEffectManager.CharacterSize(currentCharacter[name], new Vector3(size, size, 1), time);
     }
 
     public void CharacterMove(string name, float xpos, float ypos, float time)
