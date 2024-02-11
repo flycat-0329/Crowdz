@@ -31,8 +31,8 @@ public class ImageEffectManager : MonoBehaviour
     public void EffectImageOn(string imageName, float fadeTime){        //사진 등장(이펙트 이미지 페이드인)
         Sprite sprite = findEffectImage(imageName);
         effectImage.GetComponent<Image>().sprite = sprite;
-        effectImage.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, sprite.bounds.size.x);
-        effectImage.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, sprite.bounds.size.y);
+        effectImage.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, sprite.bounds.size.x * 50);
+        effectImage.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, sprite.bounds.size.y * 50);
 
         effectImage.GetComponent<Image>().DOFade(1.0f, fadeTime);
     }

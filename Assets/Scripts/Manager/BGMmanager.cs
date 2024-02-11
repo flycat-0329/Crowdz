@@ -26,9 +26,9 @@ public class BGMmanager : MonoBehaviour
         AudioClip bgAudio = findBGM(name);  //브금 이름으로 BGAudioClips에서 브금을 찾아옴
         
         BGaudioSource.clip = bgAudio;       //노래를 바꾸고
-        BGaudioSource.volume = SettingManager.instance.mainVolume * scriptVolume;
-        BGaudioSource.loop = true;          //루프를 켜고
         textVolume = scriptVolume;
+        bgmVolume();
+        BGaudioSource.loop = true;          //루프를 켜고
         BGaudioSource.Play();               //브금을 다시 틀어줍니다.
     }
 
@@ -39,10 +39,10 @@ public class BGMmanager : MonoBehaviour
         AudioClip bgAudio = findBGM(name);  //브금 이름으로 BGAudioClips에서 브금을 찾아옴
 
         BGaudioSource.clip = bgAudio;       //노래를 바꾸고
-        BGaudioSource.volume = SettingManager.instance.mainVolume * scriptVolume;
+        textVolume = scriptVolume;
+        bgmVolume();
         BGaudioSource.loop = true;          //루프를 켜고
         BGaudioSource.Play();               //브금을 다시 틀어줍니다.
-        textVolume = scriptVolume;
         BGaudioSource.DOFade(0, fadeTime);
     }
     public void stopBG(){
@@ -50,7 +50,6 @@ public class BGMmanager : MonoBehaviour
     }
     AudioClip findBGM(string name){     //브금 이름을 통해 브금을 리턴하는 함수
         foreach(var i in BGMList){     //BGAudioClips를 돌면서
-            Debug.Log(i.name);
             if(i.name == name){         //해당하는 이름의 브금을 찾으면 리턴합니다
                 return i as AudioClip;
             }

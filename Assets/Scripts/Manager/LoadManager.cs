@@ -84,6 +84,7 @@ public class LoadManager : MonoBehaviour
 
     public void LoadNewGame(string scriptName)
     {
+        SettingManager.instance.isNewGame = true;
         TextAsset ta = Resources.Load("InitData/" + scriptName) as TextAsset;
         SettingManager.instance.initDataSet = JsonUtility.FromJson<DataSet>(ta.ToString());
 

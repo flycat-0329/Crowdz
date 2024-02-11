@@ -10,7 +10,7 @@ public class TitleMenuOnOff : MonoBehaviour
     private void Start() {
         titleMenuPanel.transform.localPosition = new Vector3(0, -Screen.height, 0);
         bgm.clip = Resources.Load("Sounds/BGM/Title") as AudioClip;
-        bgm.volume = 0.3f;
+        bgm.volume = 1f;
         bgm.Play();
     }
     public void TitleMenuOn(){

@@ -27,7 +27,7 @@ public class LinePrint : MonoBehaviour
     private int scriptIndex = -1;        //현재 몇번째 대사인가, 세이브/로드 구현 시 바뀔 부분
     private float typingSpeed = 0.025f;       //글자 출력 주기
     private float scriptbgmVolume = 1;
-    private string scriptTitle;         //현제 대본 이름
+    private string scriptTitle = "Chapter0";         //현재 대본 이름
     public Text t;                      //나중에 없앨거
     private bool onTyping = false;      //글자가 나오는 중인가?
     int lineActionIndex = 0;            //한 대사 안에서 몇번째 연출을 수행중인가
@@ -36,6 +36,7 @@ public class LinePrint : MonoBehaviour
     bool onAuto = false;        //오토모드 돌리고있는 중인가?
     bool onSkip = false;        //스킵 돌리는 중인가?
     bool onInit = false;        //방금 시작했는가?
+    bool onTimer = false;
     List<List<string>> script = new List<List<string>>();   //대사만 모아놓은거
     List<List<List<string>>> action = new List<List<List<string>>>();   //연출만 모아놓은거
     // Start is called before the first frame update
@@ -46,44 +47,48 @@ public class LinePrint : MonoBehaviour
         bgmManager = GameObject.Find("BGAudioSource").GetComponent<BGMmanager>();
         esManager = GameObject.Find("ESAudioSource").GetComponent<ESManager>();
 
-        scriptTitle = SettingManager.instance.initDataSet.saveScriptName;   //저장된 대본 이름
-        scriptIndex = SettingManager.instance.initDataSet.saveScriptIndex;  //저장된 대본 위치
-
-        nameText.text = SettingManager.instance.initDataSet.saveCurrentCharacter;   //저장된 시점의 말하는 캐릭터 이름
-        mainText.text = SettingManager.instance.initDataSet.saveDialogue;        //저장된 시점의 대사
-
-        if(SettingManager.instance.initDataSet.saveIsAnim){
-            backgroundManager.BackgroundAnimOn(SettingManager.instance.initDataSet.saveBackgroundImage);    //저장된 시점의 애니메이션
-        }
-        else{
-            backgroundManager.BackgroundImageOn(SettingManager.instance.initDataSet.saveBackgroundImage);    //저장된 시점의 배경
-        }
-
-        SettingManager.instance.mainVolume = SettingManager.instance.initDataSet.saveBGMVolume; //저장된 시점의 브금 볼륨
-        scriptbgmVolume = SettingManager.instance.initDataSet.saveScriptBGMVolume;              //저장된 시점의 브금 볼륨(대본상)
-        SettingManager.instance.esVolume = SettingManager.instance.initDataSet.saveESVolume;    //저장된 시점의 효과음 볼륨
-        bgmManager.playBGM(SettingManager.instance.initDataSet.saveBGMName, scriptbgmVolume);   //저장된 시점의 브금 이름
-
-        for (int i = 0; i < SettingManager.instance.initDataSet.saveCharacterList.Count; i++)   //저장된 시점의 캐릭터들
+        if (SettingManager.instance.isNewGame == false)
         {
-            CharacterSet cha = SettingManager.instance.initDataSet.saveCharacterList[i];
-            if(cha.characterEffect == ""){
-                Debug.Log("이펙트 없음.");
-                characterManager.setCharacter(cha.characterName, cha.characterBody,
-            cha.characterXpos, cha.characterYpos);
+            scriptTitle = SettingManager.instance.initDataSet.saveScriptName;   //저장된 대본 이름
+            scriptIndex = SettingManager.instance.initDataSet.saveScriptIndex;  //저장된 대본 위치
+
+            nameText.text = SettingManager.instance.initDataSet.saveCurrentCharacter;   //저장된 시점의 말하는 캐릭터 이름
+            mainText.text = SettingManager.instance.initDataSet.saveDialogue;        //저장된 시점의 대사
+
+            if (SettingManager.instance.initDataSet.saveIsAnim)
+            {
+                backgroundManager.BackgroundAnimOn(SettingManager.instance.initDataSet.saveBackgroundImage);    //저장된 시점의 애니메이션
             }
-            else{
-                characterManager.setCharacter(cha.characterName, cha.characterEffect, cha.characterBody,
-            cha.characterXpos, cha.characterYpos);
+            else
+            {
+                backgroundManager.BackgroundImageOn(SettingManager.instance.initDataSet.saveBackgroundImage);    //저장된 시점의 배경
             }
-            
+
+            SettingManager.instance.mainVolume = SettingManager.instance.initDataSet.saveBGMVolume; //저장된 시점의 브금 볼륨
+            scriptbgmVolume = SettingManager.instance.initDataSet.saveScriptBGMVolume;              //저장된 시점의 브금 볼륨(대본상)
+            SettingManager.instance.esVolume = SettingManager.instance.initDataSet.saveESVolume;    //저장된 시점의 효과음 볼륨
+            bgmManager.playBGM(SettingManager.instance.initDataSet.saveBGMName, scriptbgmVolume);   //저장된 시점의 브금 이름
+
+            for (int i = 0; i < SettingManager.instance.initDataSet.saveCharacterList.Count; i++)   //저장된 시점의 캐릭터들
+            {
+                CharacterSet cha = SettingManager.instance.initDataSet.saveCharacterList[i];
+                if (cha.characterEffect == "")
+                {
+                    characterManager.setCharacter(cha.characterName, cha.characterBody,
+                cha.characterXpos, cha.characterYpos);
+                }
+                else
+                {
+                    characterManager.setCharacter(cha.characterName, cha.characterEffect, cha.characterBody,
+                cha.characterXpos, cha.characterYpos);
+                }
+            }
         }
 
-        Debug.Log(scriptTitle);
         KeyValuePair<List<List<string>>, List<List<List<string>>>> a = storyManager.storyFileRead(scriptTitle);
         script = a.Key;
         action = a.Value;
-    
+
         PrintController();
 
         onInit = false;
@@ -105,33 +110,34 @@ public class LinePrint : MonoBehaviour
     }
     public void PrintController()
     {
+        if(onTimer == true){
+            onTimer = false;
+            StopCoroutine("Timer");
+        }
+
         if (onTyping == true)   //대사 출력중일때
         {
-            onTyping = false;   //대사 출력 애니메이션 스킵
-
-            // onTimer = false;    //연출 스킵
             for (int i = 0; i < 10; i++)
-            {    //연출 스킵
+            {
+                DOTween.KillAll(true, new string[] { "fadeImage" });
                 ActionPlay();
             }
 
-            DOTween.KillAll(true, new string[] {"fadeImage"});
+            DOTween.KillAll(true, new string[] { "fadeImage" });
+            onTyping = false;  //대사 출력 애니메이션 스킵
         }
-
         // else if (onTimer == true)
-        // {   //대사는 끝났는데 연출은 안 끝났을 때(보통 이런경우는 별로 없음)
-        //     onTimer = false;    //연출 스킵
+        // { //대사는 끝났는데 타이머로 인해 연출은 안 끝났을 때
+            
+
         //     for (int i = 0; i < 10; i++)
         //     {    //연출 스킵
         //         ActionPlay();
-        //         effectManager.SequenceKill();
         //     }
 
-        //     scriptIndex += 1;   //대사 출력중이 아니라면 다음 대사로
-        //     lineActionIndex = 0;    //연출도 다음 대사의 첫번째 연출부터 진행되도록
-        //     ActionPlay();   //다음 대사 연출 시작
-        //     nameText.text = script[scriptIndex][1];     //이름 변경
-        //     StartCoroutine(PrintLine(script[scriptIndex][2]));  //대사 출력
+        //     DOTween.KillAll(true, new string[] { "fadeImage" });
+
+        //     PrintController();
         // }
 
         else    //대사 출력중이 아니라면 다음 대사로
@@ -155,21 +161,25 @@ public class LinePrint : MonoBehaviour
             switch (oneAction[0])
             {
                 case "등장":    //<등장, 캐릭터 이름, (표정), 자세, x좌표(0 ~ 1), y좌표(0 ~ 1)>
-                    if(onInit){
+                    if (onInit)
+                    {
                         break;
-                    }   
-                    if(oneAction.Count == 6){
+                    }
+                    if (oneAction.Count == 6)
+                    {
                         characterManager.setCharacter(oneAction[1], oneAction[2], oneAction[3],
                         float.Parse(oneAction[4]), float.Parse(oneAction[5]));
                     }
-                    else if(oneAction.Count == 5){
+                    else if (oneAction.Count == 5)
+                    {
                         characterManager.setCharacter(oneAction[1], oneAction[2],
                         float.Parse(oneAction[3]), float.Parse(oneAction[4]));
                     }
                     ActionPlay();
                     break;
                 case "이펙트":    //<이펙트, 바꿀 캐릭터, 넣을 이펙트>
-                    if(onInit){
+                    if (onInit)
+                    {
                         break;
                     }
                     characterManager.SetEffect(oneAction[1], oneAction[2]);
@@ -181,6 +191,10 @@ public class LinePrint : MonoBehaviour
                     break;
                 case "배경":    //<배경, 배경이름>
                     backgroundManager.BackgroundImageOn(oneAction[1]);
+                    ActionPlay();
+                    break;
+                case "배경페이드":  //<배경페이드, 배경이름, 시간>
+                    backgroundManager.BackgroundChangeFade(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
                 case "속도":    //<속도, 타이핑 속도>
@@ -198,19 +212,22 @@ public class LinePrint : MonoBehaviour
                     characterManager.FadeOut(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
-                case "페이드퇴장":
+                case "페이드퇴장":  //<페이드퇴장, 캐릭터 이름, x좌표, y좌표, 이동 시간>
                     characterManager.FadeOutMove(oneAction[1], float.Parse(oneAction[2]), float.Parse(oneAction[3]), float.Parse(oneAction[4]));
                     ActionPlay();
                     break;
                 case "페이드인":    //<페이드인, 캐릭터, (이펙트), 자세, x좌표(0 ~ 1), y좌표(0 ~ 1), 시간>
-                    if(onInit){
+                    if (onInit)
+                    {
                         break;
                     }
-                    if(oneAction.Count == 7){
+                    if (oneAction.Count == 7)
+                    {
                         characterManager.FadeIn(oneAction[1], oneAction[2], oneAction[3], float.Parse(oneAction[4]),
                         float.Parse(oneAction[5]), float.Parse(oneAction[6]));
                     }
-                    else if(oneAction.Count == 6){
+                    else if (oneAction.Count == 6)
+                    {
                         characterManager.FadeIn(oneAction[1], oneAction[2], float.Parse(oneAction[3]),
                         float.Parse(oneAction[4]), float.Parse(oneAction[5]));
                     }
@@ -285,16 +302,18 @@ public class LinePrint : MonoBehaviour
                     break;
                 case "대사위치":    //<대사위치, 가운데/아래>
                     effectManager.centerUISwitch();
-                    if(oneAction[1] == "가운데"){
+                    if (oneAction[1] == "가운데")
+                    {
                         mainText = mainTextList[1].GetComponent<TextMeshProUGUI>();
                     }
-                    else if(oneAction[1] == "아래"){
+                    else if (oneAction[1] == "아래")
+                    {
                         mainText = mainTextList[0].GetComponent<TextMeshProUGUI>();
                     }
                     ActionPlay();
                     break;
                 case "화면페이드":  //<화면페이드, r, g, b, a, 시간>
-                    effectManager.FadeAll(float.Parse(oneAction[1]), float.Parse(oneAction[2]), 
+                    effectManager.FadeAll(float.Parse(oneAction[1]), float.Parse(oneAction[2]),
                     float.Parse(oneAction[3]), float.Parse(oneAction[4]), float.Parse(oneAction[5]));
                     ActionPlay();
                     break;
@@ -324,8 +343,11 @@ public class LinePrint : MonoBehaviour
 
         onTyping = false;
     }
-    private IEnumerator Timer(float time){
+    private IEnumerator Timer(float time)
+    {
+        onTimer = true;
         yield return new WaitForSeconds(time);
+        onTimer = false;
         ActionPlay();
     }
     public void OnAuto()

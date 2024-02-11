@@ -35,8 +35,8 @@ public class EffectManager : MonoBehaviour
         fadePanel.GetComponent<Image>().color = new Color(r , g, b);
 
         fadeSequence = DOTween.Sequence()
-        .Append(fadePanel.GetComponent<Image>().DOFade(a, time))
-        .Append(fadePanel.GetComponent<Image>().DOFade(0.0f, time))
+        .Append(fadePanel.GetComponent<Image>().DOFade(a, time/2))
+        .Append(fadePanel.GetComponent<Image>().DOFade(0.0f, time/2))
         .SetId("fadeAll");
     }
     public void centerUISwitch(){   //자막 가운데 띄우기
