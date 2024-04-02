@@ -83,4 +83,15 @@ public class CharacterEffectManager : MonoBehaviour
         })
         .SetId("characterFadeOutKill");
     }
+
+    public void BlurCharacter(GameObject character, Material material, float size){
+        character.transform.GetChild(1).GetChild(0).gameObject.GetComponent<Image>().material = material;
+        character.transform.GetChild(1).GetChild(0).gameObject.SetActive(false);
+        material.SetFloat("_Size", size);
+        character.transform.GetChild(1).GetChild(0).gameObject.SetActive(true);
+    }
+
+    public void CharacterShaderNull(GameObject character){
+        character.GetComponent<Image>().material = null;
+    }
 }

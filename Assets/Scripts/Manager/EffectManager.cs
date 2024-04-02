@@ -8,9 +8,11 @@ public class EffectManager : MonoBehaviour
 {
     public List<GameObject> objects;
     public GameObject fadePanel;
+    public GameObject blurPanel;
     public GameObject dialoguePanel;    //정상적인 대사 ui
     public GameObject centerDialoguePanel;    //가운데에 나오는 대사 ui
     Sequence fadeSequence;
+    Sequence blurSequence;
     public void Shake(float time, float force)
     {
         objects.Clear();
@@ -43,4 +45,20 @@ public class EffectManager : MonoBehaviour
         dialoguePanel.SetActive(!dialoguePanel.activeSelf);
         centerDialoguePanel.SetActive(!centerDialoguePanel.activeSelf);
     }
+
+    public void BackgroundBlur(float pow, float time){
+        if(blurPanel.activeSelf == false){
+            blurPanel.SetActive(true);
+            blurPanel.GetComponent<Image>().material.SetFloat("_Size", 0);
+        }
+        
+        blurSequence = DOTween.Sequence()
+        .Append(blurPanel.GetComponent<Image>().material.DOFloat(pow * 3.2f, "_Size", time))
+        .SetId("BackgroundBlur")
+        .OnComplete(() => {
+            if(pow == 0){
+                blurPanel.SetActive(false);
+            }
+        });
+    }   
 }

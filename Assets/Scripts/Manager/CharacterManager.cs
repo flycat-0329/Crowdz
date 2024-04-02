@@ -8,8 +8,9 @@ public class CharacterManager : MonoBehaviour
 {
     public Dictionary<string, GameObject> currentCharacter = new Dictionary<string, GameObject>();  //현재 존재하는 캐릭터들
     public List<CharacterSet> characterList = new List<CharacterSet>();
-    Object[] EffectImageList; //시작할때 불러오는 캐릭터 얼굴 이미지
+    Object[] effectImageList; //시작할때 불러오는 캐릭터 얼굴 이미지
     Object[] characterImageList;    //시작할때 불러오는 캐릭터 몸통 이미지
+    Object[] materialList;    //메테리얼 리스트(근데 이거 여기에 있어도 되나)
     public GameObject character;    //캐릭터 오리지널 형태
     public Canvas characterCanvas;  //캐릭터가 있는 캔버스
     public CharacterEffectManager characterEffectManager;
@@ -17,8 +18,9 @@ public class CharacterManager : MonoBehaviour
 
     private void Awake()
     {
-        EffectImageList = Resources.LoadAll("Images/Character/Effect");
+        effectImageList = Resources.LoadAll("Images/Character/Effect");
         characterImageList = Resources.LoadAll("Images/Character/Body");
+        materialList = Resources.LoadAll("Materials");
     }
     public void setCharacter(string characterName, string characterEffect, string characterBody, float xpos, float ypos)
     {
@@ -97,6 +99,10 @@ public class CharacterManager : MonoBehaviour
         characterEffectManager.CharacterSize(currentCharacter[name], new Vector3(size, size, 1), time);
     }
 
+    public void CharacterBlur(string name, float size){
+        characterEffectManager.BlurCharacter(currentCharacter[name], FindMaterial("Blur"), size);
+    }
+
     public void CharacterMove(string name, float xpos, float ypos, float time)
     {
         characterMoveSequence = DOTween.Sequence()
@@ -114,7 +120,7 @@ public class CharacterManager : MonoBehaviour
 
     public Sprite FindEffect(string name)
     {
-        foreach (var i in EffectImageList)
+        foreach (var i in effectImageList)
         {
             if (i.name == name)
             {
@@ -139,6 +145,19 @@ public class CharacterManager : MonoBehaviour
         }
 
         Debug.LogFormat(this, "{0}이라는 캐릭터가 없습니다.", name);
+        return null;
+    }
+
+    public Material FindMaterial(string name){
+        foreach(var i in materialList){
+            if(i.name == name)
+            {
+                Material material = (Material) i;
+                return material;
+            }
+        }
+
+        Debug.LogFormat(this, "{0}이라는 메테리얼이 없습니다.", name);
         return null;
     }
 

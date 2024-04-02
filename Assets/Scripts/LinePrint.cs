@@ -185,6 +185,10 @@ public class LinePrint : MonoBehaviour
                     characterManager.SetEffect(oneAction[1], oneAction[2]);
                     ActionPlay();
                     break;
+                case "캐릭블러":
+                    characterManager.CharacterBlur(oneAction[1], float.Parse(oneAction[2]));
+                    ActionPlay();
+                    break;
                 case "퇴장":    //<퇴장, 퇴장할 캐릭터 이름>
                     characterManager.CharacterKill(oneAction[1]);
                     ActionPlay();
@@ -193,8 +197,8 @@ public class LinePrint : MonoBehaviour
                     backgroundManager.BackgroundImageOn(oneAction[1]);
                     ActionPlay();
                     break;
-                case "배경페이드":  //<배경페이드, 배경이름, 시간>
-                    backgroundManager.BackgroundChangeFade(oneAction[1], float.Parse(oneAction[2]));
+                case "배경효과":  //<배경효과, 페이드 이름, 배경이름, 시간>
+                    backgroundManager.EffectSwitch(oneAction[1], oneAction[2], float.Parse(oneAction[3]));
                     ActionPlay();
                     break;
                 case "속도":    //<속도, 타이핑 속도>
@@ -315,6 +319,10 @@ public class LinePrint : MonoBehaviour
                 case "화면페이드":  //<화면페이드, r, g, b, a, 시간>
                     effectManager.FadeAll(float.Parse(oneAction[1]), float.Parse(oneAction[2]),
                     float.Parse(oneAction[3]), float.Parse(oneAction[4]), float.Parse(oneAction[5]));
+                    ActionPlay();
+                    break;
+                case "배경블러":
+                    effectManager.BackgroundBlur(float.Parse(oneAction[1]), float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
             }

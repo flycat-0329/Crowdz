@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -7,11 +8,13 @@ using DG.Tweening;
 
 public class BackgroundManager : MonoBehaviour
 {
-    public Object[] backgroundList;
-    public Object[] backgroundAnimList;
+    public UnityEngine.Object[] backgroundList;
+    public UnityEngine.Object[] backgroundAnimList;
+    public UnityEngine.Object[] backgroundEffectList;
     public Image background;    //현재 배경
     public GameObject backgroundSecond; //페이드용 배경 사진
     public GameObject backgroundAnimImage;
+    public GameObject backgroundEffectImage;
     public string backgroundName;
     public bool isAnim;
     public VideoPlayer videoPlayer;
@@ -22,6 +25,7 @@ public class BackgroundManager : MonoBehaviour
     {
         backgroundList = Resources.LoadAll("Images/Background/Sprite");
         backgroundAnimList = Resources.LoadAll("Images/Background/Video");
+        backgroundEffectList = Resources.LoadAll("Images/Background/Effect");
     }
 
     public void BackgroundImageOn(string bgName)
@@ -32,19 +36,16 @@ public class BackgroundManager : MonoBehaviour
         backgroundName = bgName;
         background.sprite = FindBG(bgName);     //이미지 자체가 아닌 이미지의 이름으로 이미지를 찾아옴
     }
+    public void BackgroundAnimOn(string animName)   //애니메이션 배경 재생
+    {
+        isAnim = true;
+        backgroundName = animName;
 
-    public void BackgroundImageFadeIn(string bgName, float time){   //일정 시간에 걸쳐 이미지 배경 페이드인
-        isAnim = false;
-        backgroundAnimImage.SetActive(false);
-        background.gameObject.SetActive(true);
-        background.color = new Color(1, 1, 1, 0);
-        backgroundName = bgName;
-        background.sprite = FindBG(bgName);     //이미지 자체가 아닌 이미지의 이름으로 이미지를 찾아옴
-
-        fadeInSequence = DOTween.Sequence()
-        .Append(background.DOFade(1, time));
+        backgroundAnimImage.SetActive(true);
+        videoPlayer.clip = FindAnim(animName);
+        videoPlayer.Play();
+        StartCoroutine(videoDelay());
     }
-
     public void BackgroundChangeFade(string bgName, float time){
         Debug.Log(bgName);
         isAnim = false;
@@ -64,21 +65,36 @@ public class BackgroundManager : MonoBehaviour
         })
         .SetId("backgroundChangeFade");
     }
+    public void BackgroundChangePoint(string name, float time){
+        backgroundEffectImage.SetActive(true);
+        backgroundEffectImage.GetComponent<Image>().sprite = FindEffect("확대");
+        backgroundEffectImage.transform.localScale = new Vector3(0, 0, 0);
+        
+        Sequence pointOnSequence = DOTween.Sequence()
+        .Append(backgroundEffectImage.transform.DOScale(new Vector3(2.5f, 2.5f, 2.5f), time))
+        .OnComplete(() => {
+            background.sprite = FindBG(name);
+        })
+        .SetId("pointOnSequence");
 
-    public void BackgroundImageFadeOut(float time){  //일정 시간에 걸쳐 이미지 배경 페이드아웃
-        fadeOutSequence = DOTween.Sequence()
-        .Append(background.DOFade(0, time));
+        Sequence pointOutSequence = DOTween.Sequence()
+        .Insert(1.0f, backgroundEffectImage.transform.DOScale(new Vector3(0, 0, 0), time))
+        .OnComplete(() => {
+            backgroundEffectImage.SetActive(false);
+        })
+        .SetId("pointOutSequence");
     }
 
-    public void BackgroundAnimOn(string animName)
-    {
-        isAnim = true;
-        backgroundName = animName;
 
-        backgroundAnimImage.SetActive(true);
-        videoPlayer.clip = FindAnim(animName);
-        videoPlayer.Play();
-        StartCoroutine(videoDelay());
+    public void EffectSwitch(string effectName = "페이드", string backgroundName = "검은배경", float time = 1){
+        switch (effectName){
+            case "페이드":
+                BackgroundChangeFade(backgroundName, time);
+                break;
+            case "확대":
+                BackgroundChangePoint(backgroundName, time);
+                break;
+        }
     }
 
     Sprite FindBG(string name)
@@ -93,6 +109,18 @@ public class BackgroundManager : MonoBehaviour
         }
 
         Debug.LogFormat(this, "{0}이라는 배경이 없습니다.", name);  //없으면 ㅈ된거지 뭐
+        return null;
+    }
+
+    Sprite FindEffect(string name){
+        foreach(var i in backgroundEffectList){
+            if(i.name == name){
+                Sprite sprite = Sprite.Create((i as Texture2D), new Rect(0, 0, (i as Texture2D).width, (i as Texture2D).height), new Vector2(0.5f, 0.5f));
+                return sprite;
+            }
+        }
+
+        Debug.LogFormat(this, "{0}이라는 이펙트가 없습니다.", name);
         return null;
     }
 
