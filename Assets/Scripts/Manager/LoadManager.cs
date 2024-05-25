@@ -13,7 +13,7 @@ public class LoadManager : MonoBehaviour
     public GameObject loadPageText;
     private int loadPanelIndex;
     string path;
-    private void Awake()
+    private void Start()
     {
         for (int i = 0; i < 60; i++)
         {
@@ -26,6 +26,8 @@ public class LoadManager : MonoBehaviour
         }
 
         pageChange(-1);
+    
+        this.gameObject.GetComponent<Canvas>().worldCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
     }
     private void OnEnable()
     {
@@ -39,7 +41,7 @@ public class LoadManager : MonoBehaviour
             pageChange(-1);
         }
 
-        this.gameObject.GetComponent<Canvas>().worldCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
+        // this.gameObject.GetComponent<Canvas>().worldCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
     }
 
     public void pageChange(int a)

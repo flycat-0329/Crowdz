@@ -12,6 +12,7 @@ public class CanvasOnOff : MonoBehaviour
     public void LoadCanvasOnOff()
     {
         GameObject canvas = SettingManager.instance.LoadCanvas;
+        canvas.gameObject.GetComponent<Canvas>().worldCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         canvas.SetActive(!canvas.activeSelf);
     }
 

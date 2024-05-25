@@ -71,18 +71,6 @@ public class CharacterEffectManager : MonoBehaviour
         })
         .SetId("characterFadeOutKill");
     }
-    public void FadeOutMoveCharacter(GameObject character, float xpos, float ypos, float time)
-    {       //페이드아웃 하면서 캐릭터 움직임(보통 퇴장용)
-        characterFadeOutSequence = DOTween.Sequence()
-        .Append(character.transform.GetChild(0).GetComponent<Image>().DOFade(0, time))
-        .Join(character.transform.GetChild(1).GetComponent<Image>().DOFade(0, time))
-        .Join(character.transform.DOLocalMove(new Vector3((-0.5f + xpos) * Screen.width, (-0.5f + ypos) * Screen.height, 0), time))
-        .OnComplete(() =>
-        {
-            characterManager.CharacterKill(character.name);
-        })
-        .SetId("characterFadeOutKill");
-    }
 
     public void BlurCharacter(GameObject character, Material material, float size){
         character.transform.GetChild(1).GetChild(0).gameObject.GetComponent<Image>().material = material;

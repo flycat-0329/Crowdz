@@ -185,7 +185,7 @@ public class LinePrint : MonoBehaviour
                     characterManager.SetEffect(oneAction[1], oneAction[2]);
                     ActionPlay();
                     break;
-                case "캐릭블러":
+                case "캐릭블러":    //<캐릭블러, 바꿀 캐릭터, 강도>
                     characterManager.CharacterBlur(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
@@ -214,10 +214,6 @@ public class LinePrint : MonoBehaviour
                     break;
                 case "페이드아웃":    //<페이드아웃, 캐릭터, 시간>
                     characterManager.FadeOut(oneAction[1], float.Parse(oneAction[2]));
-                    ActionPlay();
-                    break;
-                case "페이드퇴장":  //<페이드퇴장, 캐릭터 이름, x좌표, y좌표, 이동 시간>
-                    characterManager.FadeOutMove(oneAction[1], float.Parse(oneAction[2]), float.Parse(oneAction[3]), float.Parse(oneAction[4]));
                     ActionPlay();
                     break;
                 case "페이드인":    //<페이드인, 캐릭터, (이펙트), 자세, x좌표(0 ~ 1), y좌표(0 ~ 1), 시간>
@@ -259,10 +255,6 @@ public class LinePrint : MonoBehaviour
                     backgroundManager.BackgroundAnimOn(oneAction[1]);
                     ActionPlay();
                     break;
-                case "사진페이드":  //<사진페이드, 사진 이름>
-                    imageEffectManager.fadeImageEffect(oneAction[1]);
-                    ActionPlay();
-                    break;
                 case "사진등장":    //<사진등장, 사진 이름, 등장 페이드 시간>
                     imageEffectManager.EffectImageOn(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
@@ -271,7 +263,7 @@ public class LinePrint : MonoBehaviour
                     imageEffectManager.EffectImageMove(float.Parse(oneAction[1]), float.Parse(oneAction[2]), float.Parse(oneAction[3]));
                     ActionPlay();
                     break;
-                case "사진퇴장":    //<사진퇴장, 사진 이름, 퇴장 페이드 시간>
+                case "사진퇴장":    //<사진퇴장, 퇴장 페이드 시간>
                     imageEffectManager.EffectImageOff(float.Parse(oneAction[1]));
                     ActionPlay();
                     break;
