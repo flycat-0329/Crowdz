@@ -20,6 +20,6 @@ public class TitleMenuOnOff : MonoBehaviour
     }
 
     public void TitleMenuOff(){
-        titleMenuPanel.transform.DOLocalMoveY(-1080 * 1920, 1);
+        titleMenuPanel.transform.DOLocalMoveY(-Screen.height, 1);
     }
 }

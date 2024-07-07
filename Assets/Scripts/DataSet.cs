@@ -7,6 +7,8 @@ using System;
 public class DataSet
 {
     public List<CharacterSet> saveCharacterList;
+    public bool saveIsParticle;
+    public List<string> saveParticleNameList;
     public bool saveIsAnim;
     public string saveDialogue;
     public string saveCurrentCharacter;
@@ -18,7 +20,9 @@ public class DataSet
     public float saveScriptBGMVolume;
     public float saveESVolume;
 
-    public DataSet(List<CharacterSet> characterList, bool isAnim, string dialogue, string character, int scriptIndex, string scriptName, string backgroundImage, string bgm, float bgmVolume, float scriptbgmVolume, float esVolume){
+    public DataSet(List<CharacterSet> characterList, bool isParticle, List<string> particleNameList, bool isAnim, string dialogue, string character, int scriptIndex, string scriptName, string backgroundImage, string bgm, float bgmVolume, float scriptbgmVolume, float esVolume){
+        saveIsParticle = isParticle;
+        saveParticleNameList = particleNameList;
         saveIsAnim = isAnim;
         saveDialogue = dialogue;
         saveCurrentCharacter = character;

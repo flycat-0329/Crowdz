@@ -18,6 +18,7 @@ public class LinePrint : MonoBehaviour
     public ImageEffectManager imageEffectManager;
     public ChoiceManager choiceManager;
     public SaveManager saveManager;
+    public ParticleManager particleManager;
     public DataSet dataSet;
     public CanvasOnOff canvasOnOff;
     public TextMeshProUGUI nameText;    //이름 나오는 텍스트
@@ -81,6 +82,12 @@ public class LinePrint : MonoBehaviour
                 {
                     characterManager.setCharacter(cha.characterName, cha.characterEffect, cha.characterBody,
                 cha.characterXpos, cha.characterYpos);
+                }
+            }
+
+            if(SettingManager.instance.initDataSet.saveIsParticle == true){
+                foreach(string par in SettingManager.instance.initDataSet.saveParticleNameList){
+                    particleManager.ParticleOn(par);
                 }
             }
         }
@@ -199,6 +206,14 @@ public class LinePrint : MonoBehaviour
                     break;
                 case "배경효과":  //<배경효과, 페이드 이름, 배경이름, 시간>
                     backgroundManager.EffectSwitch(oneAction[1], oneAction[2], float.Parse(oneAction[3]));
+                    ActionPlay();
+                    break;
+                case "파티클":
+                    particleManager.ParticleOn(oneAction[1]);
+                    ActionPlay();
+                    break;
+                case "파티클삭제":
+                    particleManager.ParticleOff(oneAction[1]);
                     ActionPlay();
                     break;
                 case "속도":    //<속도, 타이핑 속도>
@@ -391,7 +406,8 @@ public class LinePrint : MonoBehaviour
     }
     public void SaveClicked(string index)
     {
-        dataSet = new DataSet(characterManager.getCharacterList(), backgroundManager.isAnim, mainText.text, nameText.text, scriptIndex - 1, scriptTitle,
+        dataSet = new DataSet(characterManager.getCharacterList(), particleManager.isParticle, particleManager.curParticleNameList, 
+        backgroundManager.isAnim, mainText.text, nameText.text, scriptIndex - 1, scriptTitle,
         backgroundManager.backgroundName, bgmManager.BGMname, SettingManager.instance.mainVolume, scriptbgmVolume,
         SettingManager.instance.esVolume);
 
