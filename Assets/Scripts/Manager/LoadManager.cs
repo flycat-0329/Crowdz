@@ -13,6 +13,7 @@ public class LoadManager : MonoBehaviour
     public GameObject loadPageText;
     private int loadPanelIndex;
     string path;
+
     private void Start()
     {
         for (int i = 0; i < 60; i++)
@@ -32,6 +33,7 @@ public class LoadManager : MonoBehaviour
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoad;
+        pageChange(0);
     }
 
     private void OnSceneLoad(Scene scene, LoadSceneMode mode)
@@ -62,9 +64,36 @@ public class LoadManager : MonoBehaviour
         for (int i = loadPanelIndex * 6; i < 6 * (loadPanelIndex + 1); i++)
         {
             loadPanel.transform.GetChild(i).gameObject.SetActive(true);
+            
+            if(SettingManager.instance.allDataList[i] != null){
+                loadPanel.transform.GetChild(i).transform.GetChild(0).GetComponent<Text>().text = SettingManager.instance.allDataList[i].saveTime;
+                loadPanel.transform.GetChild(i).transform.GetChild(1).GetComponent<Text>().text = "챕터 " + SettingManager.instance.allDataList[i].saveChapterIndex;
+            }
+            else{
+                loadPanel.transform.GetChild(i).transform.GetChild(1).GetComponent<Text>().text = "저장된 데이터가 없습니다.";
+            }
         }
 
         loadPageText.GetComponent<Text>().text = (loadPanelIndex + 1).ToString() + "/10";
+    }
+
+    public void LoadAllData(){
+        for(int i = 0; i < 60; i++){
+            string p = Application.persistentDataPath + "saveData" + i + ".json";
+
+            if(File.Exists(p)){ 
+                FileStream fileStream = new FileStream(p, FileMode.Open);
+                byte[] data = new byte[fileStream.Length];
+                fileStream.Read(data, 0, data.Length);
+                fileStream.Close();
+
+                string j = Encoding.UTF8.GetString(data);
+                SettingManager.instance.allDataList.Add(JsonUtility.FromJson<DataSet>(j));
+            }
+            else{
+                SettingManager.instance.allDataList.Add(null);
+            }
+        }
     }
 
     public void LoadGame(string index)
@@ -82,6 +111,9 @@ public class LoadManager : MonoBehaviour
 
         SceneManager.LoadScene("GameScene");
         loadPanel.transform.parent.gameObject.SetActive(false);
+        
+        SettingManager.instance.mainVolume = PlayerPrefs.GetFloat("bgmVolume", 1);
+        SettingManager.instance.esVolume = PlayerPrefs.GetFloat("esVolume", 1);
     }
 
     public void LoadNewGame(string scriptName)
@@ -89,6 +121,8 @@ public class LoadManager : MonoBehaviour
         SettingManager.instance.isNewGame = true;
         TextAsset ta = Resources.Load("InitData/" + scriptName) as TextAsset;
         SettingManager.instance.initDataSet = JsonUtility.FromJson<DataSet>(ta.ToString());
+
+
 
         SceneManager.LoadScene("GameScene");
     }

@@ -7,12 +7,14 @@ using DG.Tweening;
 public class EffectManager : MonoBehaviour
 {
     public List<GameObject> objects;
+    public GameObject skipCursor;
     public GameObject fadePanel;
     public GameObject blurPanel;
     public GameObject dialoguePanel;    //정상적인 대사 ui
     public GameObject centerDialoguePanel;    //가운데에 나오는 대사 ui
     Sequence fadeSequence;
     Sequence blurSequence;
+    Sequence skipSequence;
     public void Shake(float time, float force)
     {
         objects.Clear();
@@ -60,5 +62,18 @@ public class EffectManager : MonoBehaviour
                 blurPanel.SetActive(false);
             }
         });
-    }   
+    }
+
+    public void SkipCursorCallback(bool isSkip){
+        if(isSkip == true){
+            InvokeRepeating("SkipCursor", 0, 0.05f);
+        }
+        else {
+            CancelInvoke("SkipCursor");
+        }
+    }
+
+    public void SkipCursor(){
+        skipCursor.transform.Rotate(new Vector3(0, 0, -30));
+    }
 }

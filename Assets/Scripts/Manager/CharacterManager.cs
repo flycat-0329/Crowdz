@@ -64,6 +64,27 @@ public class CharacterManager : MonoBehaviour
         characterList.Add(new CharacterSet(characterName, characterBody, xpos, ypos));
     }
 
+    public void setCharacter(string characterName, float xpos, float ypos)
+    {
+        GameObject newActor = Instantiate(character);
+        newActor.transform.SetParent(characterCanvas.transform);
+        newActor.name = characterName;
+
+        newActor.transform.localPosition = new Vector3((-0.5f + xpos) * Screen.width, (-0.5f + ypos) * Screen.height, 0);
+        newActor.transform.GetChild(1).transform.localPosition = new Vector3(0, 0, 0);
+        newActor.transform.GetChild(0).transform.localPosition = new Vector3(0, 135, 0);
+
+        newActor.transform.localScale = new Vector3(1, 1, 1);
+        newActor.transform.GetChild(1).transform.localScale = new Vector3(1, 1, 1);
+        newActor.transform.GetChild(0).transform.localScale = new Vector3(1, 1, 1);
+
+        newActor.transform.GetChild(1).GetComponent<Image>().sprite = FindCha(characterName);    //캐릭터의 몸 이미지
+        currentCharacter[characterName] = newActor.gameObject;
+        newActor.transform.GetChild(0).GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+
+        characterList.Add(new CharacterSet(characterName, xpos, ypos));
+    }
+
     public void FadeIn(string name, string effect, string body, float xpos, float ypos, float time)
     {
         setCharacter(name, effect, body, xpos, ypos);
@@ -76,6 +97,15 @@ public class CharacterManager : MonoBehaviour
     public void FadeIn(string name, string body, float xpos, float ypos, float time)
     {
         setCharacter(name, body, xpos, ypos);
+        currentCharacter[name].transform.GetChild(1).GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+        currentCharacter[name].transform.GetChild(0).GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+
+        characterEffectManager.FadeInCharacter(currentCharacter[name], time);
+    }
+
+    public void FadeIn(string name, float xpos, float ypos, float time)
+    {
+        setCharacter(name, xpos, ypos);
         currentCharacter[name].transform.GetChild(1).GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
         currentCharacter[name].transform.GetChild(0).GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
 
@@ -97,6 +127,10 @@ public class CharacterManager : MonoBehaviour
 
     public void CharacterBlur(string name, float size){
         characterEffectManager.BlurCharacter(currentCharacter[name], FindMaterial("Blur"), size);
+    }
+
+    public void CharacterColor(string name, float r, float g, float b, float time){
+        characterEffectManager.CharacterColor(currentCharacter[name], r, g, b, time);
     }
 
     public void CharacterMove(string name, float xpos, float ypos, float time)

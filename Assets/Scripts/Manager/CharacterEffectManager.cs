@@ -11,6 +11,7 @@ public class CharacterEffectManager : MonoBehaviour
     Sequence characterFadeOutSequence;
     Sequence characterBounceSequence;
     Sequence characterSizeSequence;
+    Sequence characterColorSequence;
     
     public void CharacterBounce(GameObject character){  //캐릭터 떨림
         characterBounceSequence = DOTween.Sequence()
@@ -62,6 +63,7 @@ public class CharacterEffectManager : MonoBehaviour
 
     public void FadeOutCharacter(GameObject character, float time)
     {
+        Debug.Log(character.name);
         characterFadeOutSequence = DOTween.Sequence()
         .Append(character.transform.GetChild(0).GetComponent<Image>().DOFade(0, time))
         .Join(character.transform.GetChild(1).GetComponent<Image>().DOFade(0, time))
@@ -81,5 +83,11 @@ public class CharacterEffectManager : MonoBehaviour
 
     public void CharacterShaderNull(GameObject character){
         character.GetComponent<Image>().material = null;
+    }
+
+    public void CharacterColor(GameObject character, float r = 0, float g = 0, float b = 0, float time = 0){
+        characterColorSequence = DOTween.Sequence()
+        .Append(character.transform.GetChild(1).gameObject.GetComponent<Image>().DOColor(new Color(r, g, b, 1), time))
+        .SetId("CharacterColor");
     }
 }

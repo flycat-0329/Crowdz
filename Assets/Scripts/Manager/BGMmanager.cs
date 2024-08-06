@@ -14,10 +14,12 @@ public class BGMmanager : MonoBehaviour
     public Slider BGslider;
     //브금 볼륨값 조절 슬라이더
     float textVolume = 1;   //대본에 적혀있는 볼륨값
+
     private void Awake() {
         BGMList = Resources.LoadAll("Sounds/BGM");
         BGslider.value = SettingManager.instance.mainVolume;
-        bgmVolume();
+        BGaudioSource.volume = SettingManager.instance.mainVolume;
+        playBGM("Title", 1);
     }
     public void playBGM(string name, float scriptVolume){  //대본에 적힌 브금과 볼륨으로 브금 틀기
         BGMname = name;
@@ -45,9 +47,11 @@ public class BGMmanager : MonoBehaviour
         BGaudioSource.Play();               //브금을 다시 틀어줍니다.
         BGaudioSource.DOFade(0, fadeTime);
     }
-    public void stopBG(){
+
+    public void stopBGM(){
         BGaudioSource.Stop();   //브금 멈춰!
     }
+
     AudioClip findBGM(string name){     //브금 이름을 통해 브금을 리턴하는 함수
         foreach(var i in BGMList){     //BGAudioClips를 돌면서
             if(i.name == name){         //해당하는 이름의 브금을 찾으면 리턴합니다
@@ -62,5 +66,7 @@ public class BGMmanager : MonoBehaviour
     public void bgmVolume(){
         SettingManager.instance.mainVolume = BGslider.value;    //슬라이더 값이 바뀌면 실시간으로 볼륨을 바꿔주는 함수(에디터에서 씀)
         BGaudioSource.volume = BGslider.value * textVolume;
+        
+        PlayerPrefs.SetFloat("bgmVolume", SettingManager.instance.mainVolume);
     }
 }

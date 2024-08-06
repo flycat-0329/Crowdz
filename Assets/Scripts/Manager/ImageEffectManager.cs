@@ -13,20 +13,6 @@ public class ImageEffectManager : MonoBehaviour
     {
         EffectImageList = Resources.LoadAll("Images/Effect");
     }
-    
-    public void fadeImageEffect(string imageName)   //사진페이드(나타났다가 사라짐)
-    {
-        Sprite sprite = findEffectImage(imageName);
-        effectImage.GetComponent<Image>().sprite = sprite;
-        effectImage.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, sprite.bounds.size.x);
-        effectImage.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, sprite.bounds.size.y);
-
-        fadeImageSequence = DOTween.Sequence()
-        .Append(effectImage.GetComponent<Image>().DOFade(1.0f, 0.5f))
-        .AppendInterval(0.8f)
-        .Append(effectImage.GetComponent<Image>().DOFade(0.0f, 0.5f))
-        .SetId("fadeImage");
-    }
 
     public void EffectImageOn(string imageName, float fadeTime){        //사진 등장(이펙트 이미지 페이드인)
         Sprite sprite = findEffectImage(imageName);

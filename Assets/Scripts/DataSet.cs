@@ -16,11 +16,11 @@ public class DataSet
     public string saveScriptName;
     public string saveBackgroundImage;
     public string saveBGMName;
-    public float saveBGMVolume;
     public float saveScriptBGMVolume;
-    public float saveESVolume;
+    public string saveTime;
+    public string saveChapterIndex;
 
-    public DataSet(List<CharacterSet> characterList, bool isParticle, List<string> particleNameList, bool isAnim, string dialogue, string character, int scriptIndex, string scriptName, string backgroundImage, string bgm, float bgmVolume, float scriptbgmVolume, float esVolume){
+    public DataSet(List<CharacterSet> characterList, bool isParticle, List<string> particleNameList, bool isAnim, string dialogue, string character, int scriptIndex, string scriptName, string backgroundImage, string bgm, float scriptbgmVolume, string time, string chapterIndex){
         saveIsParticle = isParticle;
         saveParticleNameList = particleNameList;
         saveIsAnim = isAnim;
@@ -31,9 +31,9 @@ public class DataSet
         saveScriptName = scriptName;
         saveBackgroundImage = backgroundImage;
         saveBGMName = bgm;
-        saveBGMVolume = bgmVolume;
         saveScriptBGMVolume = scriptbgmVolume;
-        saveESVolume = esVolume;
+        saveTime = time;
+        saveChapterIndex = chapterIndex;
     }
 }
     

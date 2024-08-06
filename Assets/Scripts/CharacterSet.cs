@@ -26,4 +26,10 @@ public class CharacterSet
         characterXpos = xpos;
         characterYpos = ypos;
     }
+
+    public CharacterSet(string name, float xpos, float ypos){
+        characterName = name;
+        characterXpos = xpos;
+        characterYpos = ypos;
+    }
 }

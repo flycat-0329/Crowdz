@@ -18,13 +18,6 @@ public class ParticleManager : MonoBehaviour
 
     private void Update() {
         if(Input.GetMouseButtonDown(0)){
-            // GameObject a = Instantiate(clickParticle);
-            // Debug.Log(Input.mousePosition);
-            // Debug.Log(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            // a.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            // a.transform.SetParent(this.transform, false);
-            // a.transform.localScale = new Vector3(1, 1, 1);
-
             Vector3 clickPosition = 
             new Vector3(Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height/2, Input.mousePosition.z + 1);
             
@@ -39,7 +32,7 @@ public class ParticleManager : MonoBehaviour
 
         isParticle = true;
         curParticleList.Add(a);
-        curParticleNameList.Add(a.name);
+        curParticleNameList.Add(a.name.Replace("(Clone)", ""));
     }
 
     public void ParticleOff(string name){

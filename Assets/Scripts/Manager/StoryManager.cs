@@ -7,9 +7,10 @@ using DG.Tweening;
 
 public class StoryManager : MonoBehaviour
 {
+    public string chapterIndex = "0";
     public KeyValuePair<List<List<string>>, List<List<List<string>>>> storyFileRead(string fileName)
     {
-        TextAsset ta = Resources.Load("Storys/" + fileName) as TextAsset;   //대본 파일(후에 리스트로 관리해야 함)
+        TextAsset ta = Resources.Load("Storys/" + fileName) as TextAsset;   //대본 파일
         StringReader sr = new StringReader(ta.text);
         List<List<string>> scriptList = new List<List<string>>();   //전체 대사 리스트
         List<List<List<string>>> actionList = new List<List<List<string>>>();   //전체 연출 리스트
@@ -17,6 +18,10 @@ public class StoryManager : MonoBehaviour
         List<string> actionLineList = new List<string>();           //연출 한줄을 임시로 저장하는 리스트
         List<List<string>> actionSetList = new List<List<string>>(); //대사 한줄에 따른 연출들을 저장하는 리스트(진짜 구조 야랄났다)
         int index = 0;      //대사를 기준으로 몇번째 대사인가?
+        
+        if(fileName == "Chapter1"){
+            chapterIndex = "1";
+        }
 
         while (true)
         {

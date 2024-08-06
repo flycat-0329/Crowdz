@@ -13,7 +13,6 @@ public class SaveManager : MonoBehaviour
     public GameObject saveButton;
     public GameObject savePageText;
     int savePanelIndex = 0;
-    
 
     private void Start() {
         savePageText.GetComponent<Text>().text = "1/10";
@@ -44,13 +43,20 @@ public class SaveManager : MonoBehaviour
         //넘어간 페이지에 있는 세이브 슬롯
         for(int i = savePanelIndex * 6; i < 6 * (savePanelIndex + 1); i++){
             savePanel.transform.GetChild(i).gameObject.SetActive(true);
+            
+            if(SettingManager.instance.allDataList[i] != null){
+                savePanel.transform.GetChild(i).transform.GetChild(0).GetComponent<Text>().text = SettingManager.instance.allDataList[i].saveTime;
+                savePanel.transform.GetChild(i).transform.GetChild(1).GetComponent<Text>().text = "챕터 " + SettingManager.instance.allDataList[i].saveChapterIndex;
+            }
+            else{
+                savePanel.transform.GetChild(i).transform.GetChild(1).GetComponent<Text>().text = "저장된 데이터가 없습니다.";
+            }
         }
 
         savePageText.GetComponent<Text>().text = (savePanelIndex + 1).ToString() + "/10";
     }
 
     public void GameSave(DataSet dataSet, string saveIndex){
-        Debug.Log(dataSet.saveCharacterList.Count);
         string jsonData = JsonUtility.ToJson(dataSet);
         Debug.Log(jsonData);
 
@@ -65,5 +71,9 @@ public class SaveManager : MonoBehaviour
         byte[] data = Encoding.UTF8.GetBytes(jsonData);
         fileStream.Write(data, 0, data.Length);
         fileStream.Close();
+
+        SettingManager.instance.allDataList[int.Parse(saveIndex)] = dataSet;
+
+        pageChange(0);
     }
 }

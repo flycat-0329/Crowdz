@@ -10,6 +10,7 @@ public class SettingManager : MonoBehaviour
     public float esVolume;      //효과음 볼륨
     public bool isNewGame = false;
     public DataSet initDataSet;
+    public List<DataSet> allDataList;
     public GameObject LoadCanvas;
     void Awake(){
         DontDestroyOnLoad(LoadCanvas);
@@ -21,5 +22,10 @@ public class SettingManager : MonoBehaviour
         else{
             Destroy(this.gameObject);
         }
+
+        instance.mainVolume = PlayerPrefs.GetFloat("bgmVolume", 1);
+        instance.esVolume = PlayerPrefs.GetFloat("esVolume", 1);
+
+        LoadCanvas.GetComponent<LoadManager>().LoadAllData();
     }
 }
