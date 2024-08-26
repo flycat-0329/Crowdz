@@ -117,8 +117,8 @@ public class CharacterManager : MonoBehaviour
         characterEffectManager.FadeOutCharacter(currentCharacter[name], time);
     }
 
-    public void characterBounce(string name){
-        characterEffectManager.CharacterBounce(currentCharacter[name]);
+    public void characterBounce(string name, float pow){
+        characterEffectManager.CharacterBounce(currentCharacter[name], pow);
     }
 
     public void CharacterSize(string name, float size, float time){

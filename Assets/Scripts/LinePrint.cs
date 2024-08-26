@@ -140,17 +140,19 @@ public class LinePrint : MonoBehaviour
         if(onTimer == true){
             onTimer = false;
             StopCoroutine("Timer");
+
+            PrintController();
         }
 
         if (onTyping == true)   //대사 출력중일때
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 2; i++)
             {
-                DOTween.KillAll(true, new string[] { "fadeImage", "CursorMove" });
+                DOTween.CompleteAll(true);
                 ActionPlay();
             }
 
-            DOTween.KillAll(true, new string[] { "fadeImage", "CursorMove" });
+            DOTween.CompleteAll(true);
             onTyping = false;  //대사 출력 애니메이션 스킵
         }
         // else if (onTimer == true)
@@ -216,7 +218,7 @@ public class LinePrint : MonoBehaviour
                     characterManager.CharacterBlur(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
-                case "캐릭색깔":
+                case "캐릭색깔":    //<캐릭색깔, r, g, b, 시간>
                     characterManager.CharacterColor(oneAction[1], float.Parse(oneAction[2]), float.Parse(oneAction[3]),
                     float.Parse(oneAction[4]), float.Parse(oneAction[5]));
                     ActionPlay();
@@ -230,7 +232,12 @@ public class LinePrint : MonoBehaviour
                     ActionPlay();
                     break;
                 case "배경효과":  //<배경효과, 효과 이름, 배경이름, 시간>
-                    backgroundManager.EffectSwitch(oneAction[1], oneAction[2], float.Parse(oneAction[3]));
+                    if(oneAction.Count == 3){
+                        backgroundManager.EffectSwitch(oneAction[1], oneAction[2]);
+                    }
+                    else if(oneAction.Count == 4){
+                        backgroundManager.EffectSwitch(oneAction[1], oneAction[2], float.Parse(oneAction[3]));
+                    }
                     ActionPlay();
                     break;
                 case "파티클":
@@ -343,8 +350,8 @@ public class LinePrint : MonoBehaviour
                         choiceManager.ChoiceAppear(oneAction[1], oneAction[2], oneAction[3], oneAction[4]);
                     }
                     break;
-                case "바운스":  //캐릭터 위아래 떨림
-                    characterManager.characterBounce(oneAction[1]);
+                case "바운스":  //캐릭터 위아래 떨림, <바운스, 강도>
+                    characterManager.characterBounce(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
                 case "확대":    //<캐릭터, 크기, 시간>

@@ -13,11 +13,11 @@ public class CharacterEffectManager : MonoBehaviour
     Sequence characterSizeSequence;
     Sequence characterColorSequence;
     
-    public void CharacterBounce(GameObject character){  //캐릭터 떨림
+    public void CharacterBounce(GameObject character, float pow){  //캐릭터 떨림
         characterBounceSequence = DOTween.Sequence()
-        .Append(character.transform.DOLocalJump(new Vector3(0, 0f, 0), 70, 1, 0.16f).SetRelative())
-        .Append(character.transform.DOLocalJump(new Vector3(0, 0f, 0), 50, 1, 0.16f).SetRelative())
-        .Append(character.transform.DOLocalJump(new Vector3(0, 0f, 0), 30, 1, 0.16f).SetRelative())
+        .Append(character.transform.DOLocalJump(new Vector3(0, 0f, 0), 70 * pow, 1, 0.16f).SetRelative())
+        .Append(character.transform.DOLocalJump(new Vector3(0, 0f, 0), 50 * pow, 1, 0.16f).SetRelative())
+        .Append(character.transform.DOLocalJump(new Vector3(0, 0f, 0), 30 * pow, 1, 0.16f).SetRelative())
         .SetId("characterBounce");
     }
 
@@ -63,7 +63,6 @@ public class CharacterEffectManager : MonoBehaviour
 
     public void FadeOutCharacter(GameObject character, float time)
     {
-        Debug.Log(character.name);
         characterFadeOutSequence = DOTween.Sequence()
         .Append(character.transform.GetChild(0).GetComponent<Image>().DOFade(0, time))
         .Join(character.transform.GetChild(1).GetComponent<Image>().DOFade(0, time))
