@@ -48,7 +48,7 @@ public class EffectManager : MonoBehaviour
         centerDialoguePanel.SetActive(!centerDialoguePanel.activeSelf);
     }
 
-    public void BackgroundBlur(float pow, float time){
+    public void BackgroundBlur(float pow, float time = 0){
         if(blurPanel.activeSelf == false){
             blurPanel.SetActive(true);
             blurPanel.GetComponent<Image>().material.SetFloat("_Size", 0);

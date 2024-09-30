@@ -63,6 +63,10 @@ public class BGMmanager : MonoBehaviour
         return null;
     }
 
+    public void volumeChange(float volume){
+        BGaudioSource.volume = SettingManager.instance.mainVolume * volume;
+    }
+
     public void bgmVolume(){
         SettingManager.instance.mainVolume = BGslider.value;    //슬라이더 값이 바뀌면 실시간으로 볼륨을 바꿔주는 함수(에디터에서 씀)
         BGaudioSource.volume = BGslider.value * textVolume;

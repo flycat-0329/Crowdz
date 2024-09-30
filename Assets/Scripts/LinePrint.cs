@@ -295,11 +295,19 @@ public class LinePrint : MonoBehaviour
                     bgmManager.playBGM(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
                     break;
+                case "브금볼륨":    //<브금볼륨, 음량> (브금은 유지하고 볼륨값을 바꿔줌)
+                    bgmManager.volumeChange(float.Parse(oneAction[1]));
+                    ActionPlay();
+                    break;
                 case "브금종료":    //<브금종료>
                     bgmManager.stopBGM();
                     ActionPlay();
                     break;
                 case "효과음":      //<효과음, 효과음 이름, 음량(크게 틀건지 작게 틀건지 / 0 ~ 1), (페이드 시간)>
+                    if(onSkip == true){
+                        ActionPlay();
+                        break;
+                    }
                     if(oneAction.Count == 3){
                         esManager.playES(oneAction[1], float.Parse(oneAction[2]));
                     }
@@ -309,6 +317,10 @@ public class LinePrint : MonoBehaviour
                     ActionPlay();
                     break;
                 case "효과음반복":  //<효과음반복, 효과음 이름, 볼륨>
+                    if(onSkip == true){
+                        ActionPlay();
+                        break;
+                    }
                     esManager.playLoopES(oneAction[1], float.Parse(oneAction[2]));
                     ActionPlay();
                     break;

@@ -18,6 +18,7 @@ public class BackgroundManager : MonoBehaviour
     public string backgroundName;
     public bool isAnim;
     public VideoPlayer videoPlayer;
+    public VideoPlayer videoPlayerSecond;
     private Sequence dissolveInSequence;
 
 
@@ -46,7 +47,7 @@ public class BackgroundManager : MonoBehaviour
         videoPlayer.Play();
         StartCoroutine(videoDelay());
     }
-    public void BackgroundChangeDissolve(string bgName, float time, bool anim = false){
+    public void BackgroundChangeDissolve(string bgName, float time){
         isAnim = false;
         backgroundName = bgName;
         backgroundAnimImage.SetActive(false);
@@ -65,7 +66,7 @@ public class BackgroundManager : MonoBehaviour
         .SetId("dissolveSequence");
     }
     public void BackgroundChangePoint(string name, float time, bool anim = false){
-        isAnim = false;
+        isAnim = anim;
         backgroundName = name;
         backgroundEffectImage.SetActive(true);
         backgroundEffectImage.GetComponent<Image>().sprite = FindEffect("확대");
@@ -75,9 +76,16 @@ public class BackgroundManager : MonoBehaviour
         Sequence pointSequence = DOTween.Sequence()
         .Append(backgroundEffectImage.transform.DOScale(new Vector3(2.5f, 2.5f, 2.5f), time))
         .AppendCallback(() => {
-            backgroundAnimImage.SetActive(false);
-            background.SetActive(true);
-            background.GetComponent<Image>().sprite = FindBG(name);
+            if(anim){
+                background.SetActive(false);
+                backgroundAnimImage.SetActive(true);
+                videoPlayer.clip = FindAnim(name);
+            }
+            else{
+                backgroundAnimImage.SetActive(false);
+                background.SetActive(true);
+                background.GetComponent<Image>().sprite = FindBG(name);
+            }
         })
         .AppendInterval(0.3f)
         .Append(backgroundEffectImage.transform.DOScale(new Vector3(0, 0, 0), time))
@@ -88,7 +96,7 @@ public class BackgroundManager : MonoBehaviour
     }
 
     public void BackgroundChangeSide(string name, bool anim = false){
-        isAnim = false;
+        isAnim = anim;
         backgroundName = name;
         backgroundEffectImage.SetActive(true);
         backgroundEffectImage.GetComponent<Image>().sprite = FindEffect("사이드");
@@ -98,16 +106,27 @@ public class BackgroundManager : MonoBehaviour
         Sequence sideseqnence = DOTween.Sequence()
         .Append(backgroundEffectImage.transform.DOLocalMoveX(0, 0.4f))
         .AppendCallback(() => {
-            backgroundAnimImage.SetActive(false);
-            background.SetActive(true);
+            if(anim){
+                background.SetActive(false);
+                backgroundAnimImage.SetActive(true);
+                videoPlayer.clip = FindAnim(name);
+            }
+            else{
+                backgroundAnimImage.SetActive(false);
+                background.SetActive(true);
+                background.GetComponent<Image>().sprite = FindBG(name);
+            }
         })
         .AppendInterval(0.3f)
         .Append(backgroundEffectImage.transform.DOLocalMoveX(3200, 0.4f))
+        .OnComplete(() => {
+            backgroundEffectImage.SetActive(false);
+        })
         .SetId("sideSequence");
     }
 
     public void BackgroundChangeFade(string name, float time, bool anim = false){
-        isAnim = false;
+        isAnim = anim;
         backgroundName = name;
         backgroundSecond.SetActive(true);
         backgroundSecond.GetComponent<Image>().color = new Color(0, 0, 0, 0);
@@ -115,9 +134,16 @@ public class BackgroundManager : MonoBehaviour
         Sequence FadeSequence = DOTween.Sequence()
         .Append(backgroundSecond.GetComponent<Image>().DOFade(1, time))
         .AppendCallback(() => {
-            backgroundAnimImage.SetActive(false);
-            background.SetActive(true);
-            background.GetComponent<Image>().sprite = FindBG(name);
+            if(anim){
+                background.SetActive(false);
+                backgroundAnimImage.SetActive(true);
+                videoPlayer.clip = FindAnim(name);
+            }
+            else{
+                backgroundAnimImage.SetActive(false);
+                background.SetActive(true);
+                background.GetComponent<Image>().sprite = FindBG(name);
+            }
         })
         .Append(backgroundSecond.GetComponent<Image>().DOFade(0, time))
         .OnComplete(() => {
@@ -127,18 +153,31 @@ public class BackgroundManager : MonoBehaviour
     }
 
     public void EffectSwitch(string effectName = "페이드", string backgroundName = "검은배경", float time = 1){
+        bool anim = false;
+        
+        if(FindBG(backgroundName) != null){
+            anim = false;
+        }
+        else if(FindAnim(backgroundName) != null){
+            anim = true;
+        }
+        else {
+            Debug.Log("배경을 찾지 못했습니다.");
+            return;
+        }
+
         switch (effectName){
             case "디졸브":
                 BackgroundChangeDissolve(backgroundName, time);
                 break;
             case "확대":
-                BackgroundChangePoint(backgroundName, time);
+                BackgroundChangePoint(backgroundName, time, anim);
                 break;
             case "사이드":
-                BackgroundChangeSide(backgroundName);
+                BackgroundChangeSide(backgroundName, anim);
                 break;
             case "페이드":
-                BackgroundChangeFade(backgroundName, time);
+                BackgroundChangeFade(backgroundName, time, anim);
                 break;
         }
     }
